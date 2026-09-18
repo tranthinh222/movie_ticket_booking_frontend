@@ -2,6 +2,8 @@ import { Outlet } from "react-router";
 import Footer from "./components/layout/Footer";
 import Header from "./components/layout/Header";
 
+import MovieAssistant from "./components/chat/MovieAssistant";
+
 const App: React.FC = () => {
   return (
     <main className="flex flex-col min-h-screen">
@@ -10,6 +12,7 @@ const App: React.FC = () => {
         <Outlet />
       </div>
       <Footer />
+      <MovieAssistant />
     </main>
   );
 };
