@@ -1,7 +1,7 @@
 import axios from "../configs/axios.config";
 import type {Discount} from "./api-discount";
 export type Topic="MOVIES"|"MOVIE_DETAILS"|"SEATS"|"DISCOUNTS";
-export interface MovieSuggestion {minTicketPrice:number|null;filmId:number;name:string;thumbnail:string|null;duration:number|null;genre:string|null;reason:string;}
+export interface MovieSuggestion {discountCode:string|null;discountAmount:number;finalTicketPrice:number|null;minTicketPrice:number|null;filmId:number;name:string;thumbnail:string|null;duration:number|null;genre:string|null;reason:string;}
 export interface SeatSuggestion {showTimeId:number;seatIds:number[];labels:string[];totalPrice:number;reason:string;}
 export interface ChatMemory {intent:"DISCOUNTS"|"MOVIES"|"MORE_MOVIES"|"MOVIE_DETAILS"|"SEATS"|"GREETING"|"CLARIFY";genre:string|null;maxDuration:number|null;date:string|null;people:number|null;budget:number|null;discountCode?:string|null;}
 export interface ChatReply {discounts:Discount[];memory:ChatMemory|null;reply:string;movies:MovieSuggestion[];seatGroups:SeatSuggestion[];}
