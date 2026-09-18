@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from "../utils/api-error";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import authApi from "../services/api-auth";
@@ -19,8 +20,8 @@ const ForgotPassword = () => {
       await authApi.forgotPassword(email);
       message.success("Mã xác thực đã được gửi đến email của bạn!");
       navigate("/verify-otp", { state: { email } });
-    } catch (error: any) {
-      message.error(error.message || "Gửi mã thất bại. Vui lòng thử lại!");
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, "Gửi mã thất bại. Vui lòng thử lại!"));
     } finally {
       setLoading(false);
     }
@@ -120,7 +121,7 @@ const ForgotPassword = () => {
           <div className="mt-4 text-center">
             <Link
               className="inline-flex items-center gap-1 text-[#8a5a62] text-xs hover:text-[#c9929b] transition-colors"
-              to="#"
+              to="/support"
             >
               <span className="material-symbols-outlined text-sm">help</span>
               Cần sự trợ giúp?

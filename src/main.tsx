@@ -1,6 +1,9 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import { createBrowserRouter, RouterProvider } from "react-router";
+import Support from "./pages/Support.tsx";
+import Terms from "./pages/Terms.tsx";
+import Privacy from "./pages/Privacy.tsx";
 import Home from "./pages/Home.tsx";
 import Theater from "./pages/Theater.tsx";
 import Promotion from "./pages/Promotion.tsx";
@@ -43,6 +46,9 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <GeneralError />,
     children: [
+      { path: "privacy", element: <Privacy /> },
+      { path: "terms", element: <Terms /> },
+      { path: "support", element: <Support /> },
       {
         index: true,
         element: <Home />,

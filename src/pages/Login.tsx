@@ -244,15 +244,15 @@ const Login: React.FC = () => {
 
             {/* Bottom Links */}
             <div className="mt-6 flex justify-center gap-6 text-xs text-gray-500">
-              <a className="hover:text-gray-300" href="#">
+              <Link className="hover:text-gray-300" to="/support">
                 Trợ giúp
-              </a>
-              <a className="hover:text-gray-300" href="#">
+              </Link>
+              <Link className="hover:text-gray-300" to="/privacy">
                 Quyền riêng tư
-              </a>
-              <a className="hover:text-gray-300" href="#">
+              </Link>
+              <Link className="hover:text-gray-300" to="/terms">
                 Điều khoản sử dụng
-              </a>
+              </Link>
             </div>
           </div>
         </main>
