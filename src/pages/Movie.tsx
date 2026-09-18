@@ -6,10 +6,12 @@ const Movie: React.FC = () => {
   const [nowShowingMovies, setNowShowingMovies] = useState<any[]>([]);
   const [comingSoonMovies, setComingSoonMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMovies = async () => {
       setLoading(true);
+      setLoadError(null);
       try {
         const [nowShowingRes, comingSoonRes] = await Promise.all([
           filmApi.getFilmByStatus("NOW_SHOWING", 1, 40),
@@ -17,9 +19,9 @@ const Movie: React.FC = () => {
         ]);
 
         const nowShowingData =
-          nowShowingRes.data?.data?.data || nowShowingRes.data?.data || [];
+          nowShowingRes.data?.data || [];
         const comingSoonData =
-          comingSoonRes.data?.data?.data || comingSoonRes.data?.data || [];
+          comingSoonRes.data?.data || [];
 
         setNowShowingMovies(
           nowShowingData.filter((m: any) => m.status === "NOW_SHOWING")
@@ -28,6 +30,7 @@ const Movie: React.FC = () => {
           comingSoonData.filter((m: any) => m.status === "COMING_SOON")
         );
       } catch (error) {
+        setLoadError("Không tải được danh sách phim. Kiểm tra backend và kết nối, rồi tải lại trang.");
         console.error("Error fetching movies:", error);
       } finally {
         setLoading(false);
@@ -36,6 +39,8 @@ const Movie: React.FC = () => {
 
     fetchMovies();
   }, []);
+
+  const featuredMovies = nowShowingMovies.slice(0, 3);
 
   if (loading) {
     return (
@@ -52,6 +57,12 @@ const Movie: React.FC = () => {
 
   return (
     <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-10 py-6 space-y-10">
+      {loadError && (
+        <div role="alert" className="rounded-xl border border-primary p-4 text-white">
+          {loadError}
+          <button className="ml-4 text-primary underline" onClick={() => window.location.reload()}>Thử lại</button>
+        </div>
+      )}
       {/* Section 1: Phim đang chiếu */}
       <section>
         <div className="flex items-center justify-between mb-5">
@@ -107,7 +118,7 @@ const Movie: React.FC = () => {
               </div>
             </Link>
           ))}
-          {nowShowingMovies.length === 0 && (
+          {!loadError && nowShowingMovies.length === 0 && (
             <div className="col-span-full py-10 text-center text-gray-500 italic">
               Hiện tại không có phim nào đang chiếu.
             </div>
@@ -168,7 +179,7 @@ const Movie: React.FC = () => {
               </div>
             </Link>
           ))}
-          {comingSoonMovies.length === 0 && (
+          {!loadError && comingSoonMovies.length === 0 && (
             <div className="col-span-full py-10 text-center text-gray-500 italic">
               Hiện tại không có phim nào sắp chiếu.
             </div>
@@ -176,135 +187,44 @@ const Movie: React.FC = () => {
         </div>
       </section>
 
-      {/* Section 3: Phim Hot (Featured Layout) - Keeping static for now as it's a special layout */}
       <section className="pb-10">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
             <span className="w-1.5 h-6 bg-primary rounded-full"></span>
-            Phim Hot Tuần Này
+            Phim nổi bật
           </h2>
-          <div className="flex gap-2">
-            <button className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center hover:bg-primary hover:border-primary hover:text-white transition-all text-gray-400">
-              <span className="material-symbols-outlined text-lg">
-                chevron_left
-              </span>
-            </button>
-            <button className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center hover:bg-primary hover:border-primary hover:text-white transition-all text-gray-400">
-              <span className="material-symbols-outlined text-lg">
-                chevron_right
-              </span>
-            </button>
-          </div>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Hot Movie Wide Card 1 */}
-          <div className="relative rounded-xl overflow-hidden aspect-video md:aspect-auto md:h-64 group cursor-pointer">
-            <div
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-              style={{
-                backgroundImage:
-                  "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDPk9_QbtCeJYJm-695dpb40S4AC0VMZSk9c4hYsXVgBIfvs-9XY9ch4mC4Sr5N4SatxLKaEYqHdraFPyOjOfDGCh6De34P-rJGNC1mzvK2Bin-2d42c-ttiQB-N8w2en-YUyjnArS0jHMRKhdjZqjATZ4m6sWFcuhih211aoXsSO2rnT6NuIs6qtMfvC1G6Aa2XHy9q7RognXeb7Dg6Q9dRbFyyNDKWl8S6fG_mvAOb1fY_ITwnKYpG8cHDJIQByUpi91_Y5wr6qQ')",
-              }}
-            ></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent"></div>
-            <div className="absolute top-4 left-4">
-              <span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
-                Top 1
-              </span>
-            </div>
-            <div className="absolute bottom-0 left-0 p-6 w-3/4">
-              <h3 className="text-white text-2xl font-bold mb-1 group-hover:text-primary transition-colors">
-                Exhuma: Quật Mộ
-              </h3>
-              <p className="text-gray-300 text-sm line-clamp-2 mb-3">
-                Một gia đình giàu có nhờ hai pháp sư trẻ giải cứu đứa con mới
-                sinh khỏi một thế lực tà ác...
-              </p>
-              <div className="flex items-center gap-4 text-xs font-medium text-gray-400">
-                <span className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-sm text-yellow-500">
-                    star
-                  </span>{" "}
-                  9.2
-                </span>
-                <span>Horror, Mystery</span>
-                <span>2024</span>
+          {featuredMovies.map((movie) => (
+            <Link
+              key={movie.id}
+              to={`/movie/${movie.id}`}
+              className="relative rounded-xl overflow-hidden aspect-video md:aspect-auto md:h-64 group cursor-pointer bg-gray-800"
+            >
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                style={{ backgroundImage: `url('${movie.thumbnail}')` }}
+              ></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 p-6 w-full">
+                <h3 className="text-white text-2xl font-bold mb-1 line-clamp-2 group-hover:text-primary transition-colors">
+                  {movie.name}
+                </h3>
+                <p className="text-gray-300 text-sm line-clamp-2 mb-3">
+                  {movie.description}
+                </p>
+                <div className="flex flex-wrap gap-4 text-xs font-medium text-gray-400">
+                  <span>{movie.duration} phút</span>
+                  <span>{movie.genre}</span>
+                </div>
               </div>
+            </Link>
+          ))}
+          {!loadError && featuredMovies.length === 0 && (
+            <div className="col-span-full py-10 text-center text-gray-500 italic">
+              Hiện tại chưa có phim nổi bật.
             </div>
-          </div>
-
-          {/* Hot Movie Wide Card 2 */}
-          <div className="relative rounded-xl overflow-hidden aspect-video md:aspect-auto md:h-64 group cursor-pointer hidden md:block">
-            <div
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-              style={{
-                backgroundImage:
-                  "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAUXfrgySy30pb5vUgnKqlJDDHIMHUOq_edUG7HVA9ftd1rHjq5eORlLgC5EKjJ94PlCVW5C9WwNFjOiV3h_OxuwLUIBsm2D62bfHL_N43P2CQWnAnF2pTC8pw6eDnf0uvsbAOLRKnkwwc_whxlQCFUvL9x_9DzDNXi1pqGlcMya34cxrTeTXYJWxMaE7imsZ0Inw_GQwzzgLiogG3XAw_5xPQbFOBOu1jFrg90jl3Pkdf5NDshQ7sr59ZRFkWIEdmhHzGB6_8Cjco')",
-              }}
-            ></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent"></div>
-            <div className="absolute top-4 left-4">
-              <span className="bg-gray-700 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                Top 2
-              </span>
-            </div>
-            <div className="absolute bottom-0 left-0 p-6 w-3/4">
-              <h3 className="text-white text-2xl font-bold mb-1 group-hover:text-primary transition-colors">
-                House of Dragon
-              </h3>
-              <p className="text-gray-300 text-sm line-clamp-2 mb-3">
-                Phần tiền truyện của Game of Thrones, xoay quanh sự sụp đổ của
-                nhà Targaryen...
-              </p>
-              <div className="flex items-center gap-4 text-xs font-medium text-gray-400">
-                <span className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-sm text-yellow-500">
-                    star
-                  </span>{" "}
-                  8.9
-                </span>
-                <span>Fantasy, Drama</span>
-                <span>2023</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Hot Movie Wide Card 3 */}
-          <div className="relative rounded-xl overflow-hidden aspect-video md:aspect-auto md:h-64 group cursor-pointer hidden lg:block">
-            <div
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-              style={{
-                backgroundImage:
-                  "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBiaAIo8r5ak2XOdS9ue_XclhMs3ppFLx62iW17-aOYtwjSblAgjnWTxvx42qM81GCcOG7KF2Wcg2NZaaxM_o4zanZr6uLQZtq9uEXuECrIKc21CgnkW2aqiXnmUpg9FSVHaz8nNwDpokwZ4P7CBU4snuHW3YavsYpdejGZEa_0ZwhZcpQG2oMqZsnrAIpCQ2SP8IVth5_B5r6Jsi2b8lpOZ9DrxErKg7txMEomzvzNSAeaFFmc3RDB9wvdqs3mcqSyKWZFZN_ceE8')",
-              }}
-            ></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent"></div>
-            <div className="absolute top-4 left-4">
-              <span className="bg-gray-700 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                Top 3
-              </span>
-            </div>
-            <div className="absolute bottom-0 left-0 p-6 w-3/4">
-              <h3 className="text-white text-2xl font-bold mb-1 group-hover:text-primary transition-colors">
-                Poor Things
-              </h3>
-              <p className="text-gray-300 text-sm line-clamp-2 mb-3">
-                Câu chuyện về sự tiến hóa kỳ diệu của Bella Baxter, một phụ nữ
-                trẻ được hồi sinh...
-              </p>
-              <div className="flex items-center gap-4 text-xs font-medium text-gray-400">
-                <span className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-sm text-yellow-500">
-                    star
-                  </span>{" "}
-                  8.4
-                </span>
-                <span>Comedy, Sci-Fi</span>
-                <span>2023</span>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </section>
     </main>

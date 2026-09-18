@@ -9,10 +9,12 @@ const Home: React.FC = () => {
     "NOW_SHOWING"
   );
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMovies = async () => {
       setLoading(true);
+      setLoadError(null);
       try {
         const [nowShowingRes, comingSoonRes] = await Promise.all([
           filmApi.getFilmByStatus("NOW_SHOWING", 1, 10),
@@ -20,9 +22,9 @@ const Home: React.FC = () => {
         ]);
 
         const nowShowingData =
-          nowShowingRes.data?.data?.data || nowShowingRes.data?.data || [];
+          nowShowingRes.data?.data || [];
         const comingSoonData =
-          comingSoonRes.data?.data?.data || comingSoonRes.data?.data || [];
+          comingSoonRes.data?.data || [];
 
         setNowShowingMovies(
           Array.isArray(nowShowingData) ? nowShowingData.slice(0, 10) : []
@@ -31,6 +33,7 @@ const Home: React.FC = () => {
           Array.isArray(comingSoonData) ? comingSoonData.slice(0, 10) : []
         );
       } catch (error) {
+        setLoadError("Không tải được danh sách phim. Kiểm tra backend và kết nối, rồi tải lại trang.");
         console.error("Error fetching homepage movies:", error);
       } finally {
         setLoading(false);
@@ -44,6 +47,12 @@ const Home: React.FC = () => {
 
   return (
     <main className="flex-grow">
+      {loadError && (
+        <div role="alert" className="p-4 text-center text-white">
+          {loadError}
+          <button className="ml-4 text-primary underline" onClick={() => window.location.reload()}>Thử lại</button>
+        </div>
+      )}
       {/* Hero Section */}
       <section className="relative w-full h-[500px] md:h-[600px] overflow-hidden group">
         {/* Background Image */}

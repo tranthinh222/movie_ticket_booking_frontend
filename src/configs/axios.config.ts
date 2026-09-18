@@ -3,11 +3,12 @@ import axios from "axios";
 const instance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
   withCredentials: true,
+  timeout: 15000,
 });
 
 const handleRefreshToken = async (): Promise<string | null> => {
   try {
-    const res = await instance.post("/api/v1/auth/refresh");
+    const res = await instance.get("/api/v1/auth/refresh");
     if (res && (res as any).data?.accessToken) {
       return (res as any).data.accessToken;
     }
@@ -20,7 +21,12 @@ const handleRefreshToken = async (): Promise<string | null> => {
 instance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("access_token");
-    if (token) {
+    const pathname = new URL(config.url || "", config.baseURL || window.location.origin).pathname;
+    const isPublicFilmRequest =
+      config.method?.toLowerCase() === "get" &&
+      /^\/api\/v1\/films(?:\/|$)/.test(pathname);
+    const isRefreshRequest = pathname === "/api/v1/auth/refresh";
+    if (token && !isPublicFilmRequest && !isRefreshRequest) {
       config.headers = config.headers || {};
       config.headers["Authorization"] = `Bearer ${token}`;
     }

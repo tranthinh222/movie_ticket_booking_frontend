@@ -10,6 +10,9 @@ interface SeatWithSelection extends IShowtimeSeat {
   isSelected: boolean;
 }
 
+const formatBookingDate = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
 const Booking: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -31,7 +34,7 @@ const Booking: React.FC = () => {
     null
   );
   const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
+    formatBookingDate(new Date())
   );
 
   // Loading states
@@ -62,7 +65,7 @@ const Booking: React.FC = () => {
     const date = new Date();
     date.setDate(date.getDate() + i);
     return {
-      value: date.toISOString().split("T")[0],
+      value: formatBookingDate(date),
       label: date.toLocaleDateString("vi-VN", {
         weekday: "short",
         day: "2-digit",

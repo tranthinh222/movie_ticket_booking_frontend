@@ -38,6 +38,9 @@ const showtimeApi = {
     const response = await axios.get(`${backendUrl}/api/v1/showtimes`, {
       params: {
         filter,
+        page: 1,
+        size: 200,
+        sort: "startTime,asc",
       },
     });
     return response;

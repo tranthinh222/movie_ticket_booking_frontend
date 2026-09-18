@@ -116,7 +116,7 @@ const Payment: React.FC = () => {
     } catch (error: any) {
       console.error("Payment error:", error);
       message.error(
-        error.response?.data?.message ||
+        error.message || error.response?.data?.message ||
           "Đã có lỗi xảy ra khi thực hiện thanh toán."
       );
     } finally {

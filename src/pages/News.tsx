@@ -1,4 +1,7 @@
+import { useState } from "react";
+
 const News: React.FC = () => {
+  const [visibleCount, setVisibleCount] = useState(3);
   return (
     <main className="flex-1 flex flex-col items-center w-full">
       <div className="w-full max-w-[1200px] px-4 md:px-6 lg:px-8 py-6">
@@ -181,6 +184,7 @@ const News: React.FC = () => {
           </article>
 
           {/* Card 4 */}
+          {visibleCount >= 4 && (
           <article className="flex flex-col gap-3 group cursor-pointer bg-[#2f161a] rounded-xl p-3 border border-[#482329] hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
             <div className="relative w-full aspect-video overflow-hidden rounded-lg">
               <div
@@ -210,8 +214,10 @@ const News: React.FC = () => {
               </p>
             </div>
           </article>
+          )}
 
           {/* Card 5 */}
+          {visibleCount >= 5 && (
           <article className="flex flex-col gap-3 group cursor-pointer bg-[#2f161a] rounded-xl p-3 border border-[#482329] hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
             <div className="relative w-full aspect-video overflow-hidden rounded-lg">
               <div
@@ -242,8 +248,10 @@ const News: React.FC = () => {
               </p>
             </div>
           </article>
+          )}
 
           {/* Card 6 */}
+          {visibleCount >= 6 && (
           <article className="flex flex-col gap-3 group cursor-pointer bg-[#2f161a] rounded-xl p-3 border border-[#482329] hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
             <div className="relative w-full aspect-video overflow-hidden rounded-lg">
               <div
@@ -273,11 +281,13 @@ const News: React.FC = () => {
               </p>
             </div>
           </article>
+          )}
         </div>
 
         {/* Pagination / Load More */}
         <div className="flex justify-center pb-12">
-          <button className="group flex items-center justify-center gap-2 bg-[#2f161a] border border-[#482329] hover:border-primary text-white font-medium py-3 px-8 rounded-lg transition-all hover:bg-white/5">
+          {visibleCount < 6 ? (
+          <button type="button" onClick={() => setVisibleCount((count) => Math.min(count + 3, 6))} className="group flex items-center justify-center gap-2 bg-[#2f161a] border border-[#482329] hover:border-primary text-white font-medium py-3 px-8 rounded-lg transition-all hover:bg-white/5">
             <span className="group-hover:text-primary transition-colors">
               Xem thêm tin tức
             </span>
@@ -285,6 +295,9 @@ const News: React.FC = () => {
               expand_more
             </span>
           </button>
+          ) : (
+            <p role="status" className="text-gray-400">Bạn đã xem hết tin tức.</p>
+          )}
         </div>
       </div>
     </main>
