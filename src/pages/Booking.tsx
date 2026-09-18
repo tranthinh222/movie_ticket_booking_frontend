@@ -4,6 +4,7 @@ import addressApi from "../services/api-address";
 import showtimeApi from "../services/api-showtime";
 import seatApi from "../services/api-seat";
 import filmApi from "../services/api-film";
+import {useAssistantContext} from "../components/chat/assistant-context";
 
 // Extended seat type for UI state
 interface SeatWithSelection extends IShowtimeSeat {
@@ -52,6 +53,10 @@ const Booking: React.FC = () => {
   const vipSeat = seats.find((s) => s.seatVariantName === "VIP");
 
   // Get film info
+  useEffect(() => {
+    useAssistantContext.getState().setShowTimeId(selectedShowtime?.id ?? null);
+    return () => useAssistantContext.getState().setShowTimeId(null);
+  }, [selectedShowtime?.id]);
   const filmInfo = film || selectedShowtime?.film;
 
   // Calculate total price based on selected seats' individual prices + movie price
@@ -277,6 +282,9 @@ const Booking: React.FC = () => {
   );
 
   const rows = Object.keys(seatsByRow).sort();
+  // Shared layout convention with Smart Seat: one central aisle.
+  const aisleAfter = Math.floor(Math.max(0, ...seats.map(seat => seat.number)) / 2);
+  const columns = Math.max(0, ...seats.map(seat => seat.number));
 
   // Render seat button
   const renderSeat = (seat: SeatWithSelection) => {
@@ -594,21 +602,24 @@ const Booking: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Seat Grid */}
-                <div className="w-full max-w-lg mx-auto">
-                  {rows.map((row) => (
-                    <div
-                      key={row}
-                      className="flex justify-center gap-2 md:gap-3 mb-3"
-                    >
-                      <span className="w-6 flex items-center justify-center text-[#c9929b] text-xs font-bold">
-                        {row}
-                      </span>
-                      {seatsByRow[row]
-                        .sort((a, b) => a.number - b.number)
-                        .map(renderSeat)}
-                    </div>
-                  ))}
+                {/* Seat Grid: keep empty positions and aisle aligned across rows. */}
+                <div className="w-full overflow-x-auto pb-4 mb-3">
+                  <div className="w-max min-w-full mx-auto">
+                    {rows.map(row => (
+                      <div key={row} className="flex justify-center items-center gap-2 md:gap-3 mb-3">
+                        <span className="w-6 shrink-0 text-[#c9929b] text-xs font-bold">{row}</span>
+                        {Array.from({length: columns}, (_, index) => {
+                          const number = index + 1;
+                          const seat = seatsByRow[row].find(item => item.number === number);
+                          return <div key={number} className="flex items-center gap-2 md:gap-3 shrink-0">
+                            {seat ? renderSeat(seat) : <span className="size-8 md:size-9" aria-hidden="true" />}
+                            {number === aisleAfter && <span className="w-8 md:w-12 h-8 md:h-9 border-x border-dashed border-[#75404c]/50" aria-label="Lối đi giữa hai cụm ghế" />}
+                          </div>;
+                        })}
+                      </div>
+                    ))}
+                    <p className="text-center text-xs text-[#c9929b] mt-4">Lối đi ở giữa hai cụm ghế</p>
+                  </div>
                 </div>
 
                 {/* Legend */}

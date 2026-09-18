@@ -25,9 +25,11 @@ instance.interceptors.request.use(
     const isPublicFilmRequest =
       config.method?.toLowerCase() === "get" &&
       /^\/api\/v1\/(?:films|news|discounts)(?:\/|$)/.test(pathname);
+    const isPublicAssistantRequest = config.method?.toLowerCase() === "post" &&
+      /^\/api\/v1\/assistant\/(?:chat|recommendations|seat-recommendations)$/.test(pathname);
     const isRefreshRequest = pathname === "/api/v1/auth/refresh";
     const isAuthEntryRequest = /^\/api\/v1\/auth\/(?:login|register)$/.test(pathname);
-    if (token && !isPublicFilmRequest && !isRefreshRequest && !isAuthEntryRequest) {
+    if (token && !isPublicFilmRequest && !isPublicAssistantRequest && !isRefreshRequest && !isAuthEntryRequest) {
       config.headers = config.headers || {};
       config.headers["Authorization"] = `Bearer ${token}`;
     }
