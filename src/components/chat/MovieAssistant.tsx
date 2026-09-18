@@ -81,7 +81,7 @@ export default function MovieAssistant() {
           </div>)}
           {item.seatGroups?.map(group=><div key={group.seatIds.join(",")} className="cine-chat-result"><strong>{group.labels.join(", ")}</strong><small>{group.totalPrice.toLocaleString("vi-VN")}đ · Suất #{group.showTimeId}</small><small>{group.reason}</small></div>)}
         </div>)}
-        {pending&&<p role="status">Đang tìm thông tin...</p>}
+        {pending&&<p role="status">CineMovie đang trả lời…</p>}
         {error&&<p role="alert">{error} Bạn có thể bấm gửi để thử lại.</p>}
         <div ref={bottom} />
       </div>
