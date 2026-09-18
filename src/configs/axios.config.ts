@@ -24,9 +24,10 @@ instance.interceptors.request.use(
     const pathname = new URL(config.url || "", config.baseURL || window.location.origin).pathname;
     const isPublicFilmRequest =
       config.method?.toLowerCase() === "get" &&
-      /^\/api\/v1\/films(?:\/|$)/.test(pathname);
+      /^\/api\/v1\/(?:films|news)(?:\/|$)/.test(pathname);
     const isRefreshRequest = pathname === "/api/v1/auth/refresh";
-    if (token && !isPublicFilmRequest && !isRefreshRequest) {
+    const isAuthEntryRequest = /^\/api\/v1\/auth\/(?:login|register)$/.test(pathname);
+    if (token && !isPublicFilmRequest && !isRefreshRequest && !isAuthEntryRequest) {
       config.headers = config.headers || {};
       config.headers["Authorization"] = `Bearer ${token}`;
     }
@@ -45,7 +46,7 @@ instance.interceptors.response.use(
       error.response &&
       error.response.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes("/api/v1/auth/refresh")
+      !/\/api\/v1\/auth\/(?:refresh|login|register)(?:[?#]|$)/.test(originalRequest.url)
     ) {
       originalRequest._retry = true;
       const access_token = await handleRefreshToken();

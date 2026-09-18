@@ -1,3 +1,5 @@
+import { message } from "antd";
+import { getApiErrorMessage } from "../utils/api-error";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import authApi from "../services/api-auth";
@@ -20,7 +22,7 @@ const Login: React.FC = () => {
 
     // Validation
     if (!email.trim()) {
-      setError("Vui lòng nhập email hoặc số điện thoại");
+      setError("Vui lòng nhập email");
       return;
     }
     if (!password.trim()) {
@@ -28,10 +30,14 @@ const Login: React.FC = () => {
       return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("Email không đúng định dạng.");
+      return;
+    }
     setIsLoading(true);
 
     try {
-      const response = await authApi.login(email, password);
+      const response = await authApi.login(email.trim(), password);
 
       if (response.statusCode === 200 || response.statusCode === 201) {
         // Store access token
@@ -46,28 +52,14 @@ const Login: React.FC = () => {
         }
 
         // Navigate to home
+        message.success("Đăng nhập thành công.");
         navigate("/");
       } else {
         // Handle error from backend
-        const errorMessage =
-          typeof response.message === "string"
-            ? response.message
-            : response.error || "Đăng nhập thất bại. Vui lòng thử lại.";
-        setError(errorMessage);
+        setError(getApiErrorMessage(response, "Đăng nhập thất bại. Vui lòng thử lại."));
       }
     } catch (err: unknown) {
-      console.error("Login error:", err);
-      if (err && typeof err === "object" && "response" in err) {
-        const axiosError = err as {
-          response?: { data?: { message?: string } };
-        };
-        setError(
-          axiosError.response?.data?.message ||
-            "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin."
-        );
-      } else {
-        setError("Có lỗi xảy ra. Vui lòng thử lại sau.");
-      }
+      setError(getApiErrorMessage(err, "Đăng nhập thất bại. Vui lòng thử lại."));
     } finally {
       setIsLoading(false);
     }
@@ -145,7 +137,7 @@ const Login: React.FC = () => {
                     className="text-white text-sm font-medium"
                     htmlFor="email"
                   >
-                    Email hoặc số điện thoại
+                    Email
                   </label>
                   <input
                     className="w-full h-12 px-4 rounded-lg bg-[#482329] border-transparent text-white placeholder-rose-200/50 focus:border-primary focus:bg-[#2d1519] focus:ring-1 focus:ring-primary transition-colors duration-200"

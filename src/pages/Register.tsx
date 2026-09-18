@@ -1,3 +1,5 @@
+import { message } from "antd";
+import { getApiErrorMessage } from "../utils/api-error";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import authApi from "../services/api-auth";
@@ -45,35 +47,25 @@ const Register: React.FC = () => {
       return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("Email không đúng định dạng.");
+      return;
+    }
     setIsLoading(true);
 
     try {
-      const response = await authApi.register(username, email, password);
+      const response = await authApi.register(username.trim(), email.trim(), password);
 
       if (response.statusCode === 200 || response.statusCode === 201) {
         // Registration successful, redirect to homepage
+        message.success("Đăng ký thành công. Bạn có thể đăng nhập bằng tài khoản vừa tạo.");
         navigate("/login");
       } else {
         // Handle error from backend
-        const errorMessage =
-          typeof response.message === "string"
-            ? response.message
-            : response.error || "Đăng ký thất bại. Vui lòng thử lại.";
-        setError(errorMessage);
+        setError(getApiErrorMessage(response, "Đăng ký thất bại. Vui lòng thử lại."));
       }
     } catch (err: unknown) {
-      console.error("Register error:", err);
-      if (err && typeof err === "object" && "response" in err) {
-        const axiosError = err as {
-          response?: { data?: { message?: string } };
-        };
-        setError(
-          axiosError.response?.data?.message ||
-            "Đăng ký thất bại. Vui lòng kiểm tra lại thông tin."
-        );
-      } else {
-        setError("Có lỗi xảy ra. Vui lòng thử lại sau.");
-      }
+      setError(getApiErrorMessage(err, "Đăng ký thất bại. Vui lòng thử lại."));
     } finally {
       setIsLoading(false);
     }

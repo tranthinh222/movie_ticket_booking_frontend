@@ -31,6 +31,7 @@ const menuItems: MenuProps["items"] = [
   { key: "/admin/films", icon: <VideoCameraOutlined />, label: "Phim" },
   { key: "/admin/showtimes", icon: <ScheduleOutlined />, label: "Suất chiếu" },
   { key: "/admin/addresses", icon: <PushpinOutlined />, label: "Địa chỉ" },
+  { key: "/admin/news", icon: <FileTextOutlined />, label: "Tin tức" },
   { key: "/admin/bookings", icon: <FileTextOutlined />, label: "Đặt vé" },
 ];
 
