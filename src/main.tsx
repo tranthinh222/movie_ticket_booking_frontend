@@ -23,6 +23,7 @@ import MovieDetail from "./pages/MovieDetail.tsx";
 import UserManagement from "./pages/admin/UserManagement.tsx";
 import TheaterManagement from "./pages/admin/TheaterManagement.tsx";
 import ShowtimeManagement from "./pages/admin/ShowtimeManagement.tsx";
+import DiscountManagement from "./pages/admin/DiscountManagement.tsx";
 import NewsManagement from "./pages/admin/NewsManagement.tsx";
 import FilmManagement from "./pages/admin/FilmManagement.tsx";
 import AddressManagement from "./pages/admin/AddressManagement.tsx";
@@ -173,6 +174,7 @@ const router = createBrowserRouter([
         element: <ShowtimeManagement />,
       },
       { path: "news", element: <NewsManagement /> },
+      { path: "discounts", element: <DiscountManagement /> },
       {
         path: "films",
         element: <FilmManagement />,

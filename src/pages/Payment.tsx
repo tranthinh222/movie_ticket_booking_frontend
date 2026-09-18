@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import seatApi from "../services/api-seat";
 import bookingApi from "../services/api-booking";
+import discountApi, { type DiscountQuote } from "../services/api-discount";
+import { getApiErrorMessage } from "../utils/api-error";
 import { message } from "antd";
 
 interface PaymentState {
@@ -23,6 +25,20 @@ const Payment: React.FC = () => {
   const [isReleasingSeats, setIsReleasingSeats] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<string>("CASH");
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountQuote, setDiscountQuote] = useState<DiscountQuote | null>(null);
+  const [applyingDiscount, setApplyingDiscount] = useState(false);
+  const applyDiscount = async () => {
+    if (!discountCode.trim()) { message.error("Vui lòng nhập mã ưu đãi."); return; }
+    setApplyingDiscount(true);
+    setDiscountQuote(null);
+    try {
+      const response = await discountApi.quote(discountCode.trim());
+      setDiscountQuote(response.data);
+      message.success("Đã áp dụng mã " + response.data.code);
+    } catch (error) { message.error(getApiErrorMessage(error, "Không áp dụng được mã ưu đãi.")); }
+    finally { setApplyingDiscount(false); }
+  };
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Redirect if no state
@@ -92,16 +108,17 @@ const Payment: React.FC = () => {
 
   // Handle Payment
   const handlePayment = async () => {
-    if (!state) return;
+    if (!state || isProcessing || applyingDiscount) return;
+    if (timeRemaining <= 0) { message.error("Thời gian giữ ghế đã hết. Vui lòng chọn ghế lại."); return; }
 
     setIsProcessing(true);
     try {
-      const response = await bookingApi.createBooking(selectedPaymentMethod);
+      const response = await bookingApi.createBooking(selectedPaymentMethod, discountQuote?.code);
 
       if (selectedPaymentMethod === "CASH") {
         message.success("Đặt vé thành công! Vui lòng thanh toán tại quầy.");
         navigate("/payment-success", {
-          state: { ...state, paymentMethod: selectedPaymentMethod },
+          state: { ...state, totalPrice: response.data?.price ?? state.totalPrice, paymentMethod: selectedPaymentMethod },
         });
       } else {
         // For VNPAY and MOMO, redirect to payment URL
@@ -115,10 +132,7 @@ const Payment: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Payment error:", error);
-      message.error(
-        error.message || error.response?.data?.message ||
-          "Đã có lỗi xảy ra khi thực hiện thanh toán."
-      );
+      message.error(getApiErrorMessage(error, "Không thực hiện được thanh toán. Vui lòng thử lại."));
     } finally {
       setIsProcessing(false);
     }
@@ -129,6 +143,7 @@ const Payment: React.FC = () => {
   }
 
   const { movie, cinema, showtime, seats, totalPrice } = state;
+  const payableTotal = discountQuote?.total ?? totalPrice;
 
   return (
     <div className="min-h-screen flex flex-col bg-[#221013] text-white">
@@ -387,12 +402,20 @@ const Payment: React.FC = () => {
                 </div>
 
                 {/* Total */}
+                <div className="space-y-3 py-4">
+                  <label htmlFor="discount-code" className="text-gray-300">Mã ưu đãi</label>
+                  <div className="flex gap-2">
+                    <input id="discount-code" value={discountCode} maxLength={40} disabled={isProcessing || applyingDiscount} onChange={(event) => { setDiscountCode(event.target.value); setDiscountQuote(null); }} placeholder="Nhập mã ưu đãi" className="min-w-0 flex-1 rounded-lg bg-[#482329] p-3 text-white" />
+                    <button type="button" disabled={isProcessing || applyingDiscount} onClick={() => void applyDiscount()} className="text-primary disabled:opacity-50">{applyingDiscount ? "Đang kiểm tra..." : "Áp dụng"}</button>
+                  </div>
+                  {discountQuote && <div className="flex justify-between text-gray-300"><span>Giảm {discountQuote.code}: {discountQuote.discountAmount.toLocaleString("vi-VN")}đ</span><button type="button" disabled={isProcessing || applyingDiscount} onClick={() => { setDiscountQuote(null); setDiscountCode(""); }} className="text-primary">Bỏ mã</button></div>}
+                </div>
                 <div className="flex justify-between items-end pt-2">
                   <span className="text-white text-lg font-bold">
                     Tổng thanh toán
                   </span>
                   <span className="text-primary text-2xl font-black tracking-tight">
-                    {totalPrice?.toLocaleString() || 0}đ
+                    {payableTotal?.toLocaleString() || 0}đ
                   </span>
                 </div>
               </div>
@@ -401,12 +424,12 @@ const Payment: React.FC = () => {
               <div className="p-6 pt-0 flex flex-col gap-3">
                 <button
                   onClick={handlePayment}
-                  disabled={isProcessing}
+                  disabled={isProcessing || applyingDiscount}
                   className="flex w-full items-center justify-center rounded-lg bg-primary py-4 text-white font-bold text-base hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isProcessing
                     ? "Đang xử lý..."
-                    : `Thanh toán ${totalPrice?.toLocaleString() || 0}đ`}
+                    : `Thanh toán ${payableTotal?.toLocaleString() || 0}đ`}
                 </button>
                 <button
                   onClick={handleCancel}

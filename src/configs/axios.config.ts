@@ -24,7 +24,7 @@ instance.interceptors.request.use(
     const pathname = new URL(config.url || "", config.baseURL || window.location.origin).pathname;
     const isPublicFilmRequest =
       config.method?.toLowerCase() === "get" &&
-      /^\/api\/v1\/(?:films|news)(?:\/|$)/.test(pathname);
+      /^\/api\/v1\/(?:films|news|discounts)(?:\/|$)/.test(pathname);
     const isRefreshRequest = pathname === "/api/v1/auth/refresh";
     const isAuthEntryRequest = /^\/api\/v1\/auth\/(?:login|register)$/.test(pathname);
     if (token && !isPublicFilmRequest && !isRefreshRequest && !isAuthEntryRequest) {

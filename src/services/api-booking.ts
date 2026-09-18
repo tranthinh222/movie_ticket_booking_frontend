@@ -1,9 +1,10 @@
 import axios from "../configs/axios.config";
 const bookingApi = {
-  createBooking: async (paymentMethod: string) => {
+  createBooking: async (paymentMethod: string, discountCode?: string) => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const response = await axios.post(`${backendUrl}/api/v1/bookings`, {
       paymentMethod,
+      discountCode,
     });
     return response;
   },

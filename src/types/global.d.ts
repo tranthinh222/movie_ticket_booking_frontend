@@ -155,6 +155,9 @@ declare global {
     seats: IShowtimeSeat[];
     totalPrice?: number;
     total_price?: number;
+    subtotal?: number;
+    discountCode?: string;
+    discountAmount?: number;
     paymentMethod: string;
     status: string;
     qrCode?: string;

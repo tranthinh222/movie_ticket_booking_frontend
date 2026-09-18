@@ -19,6 +19,8 @@ interface ITicket {
   seats: string[];
   bookingCode: string;
   totalPrice: number;
+  discountCode?: string;
+  discountAmount?: number;
   status: TicketStatus;
   qrCode?: string;
 }
@@ -85,6 +87,8 @@ const BookingHistory: React.FC = () => {
               b.seats?.map((s: any) => `${s.seatRow || ""}${s.number}`) || [],
             bookingCode: b.paymentId || `#BK${b.id}`,
             totalPrice: b.total_price || 0,
+            discountCode: b.discountCode,
+            discountAmount: b.discountAmount,
             status: status,
             qrCode: b.qrCode || b.qr_code || null,
           };
@@ -300,6 +304,11 @@ const BookingHistory: React.FC = () => {
                         {formatPrice(ticket.totalPrice)}
                       </span>
                     </div>
+                    {ticket.discountCode && (
+                      <p className="text-sm text-[#c9929b]">
+                        Mã {ticket.discountCode}: giảm {(ticket.discountAmount || 0).toLocaleString("vi-VN")}đ
+                      </p>
+                    )}
                     <div className="flex gap-3">
                       {ticket.qrCode && ticket.status !== "cancelled" && (
                         <button
