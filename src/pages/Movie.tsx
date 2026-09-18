@@ -30,7 +30,7 @@ const Movie: React.FC = () => {
           comingSoonData.filter((m: any) => m.status === "COMING_SOON")
         );
       } catch (error) {
-        setLoadError("Không tải được danh sách phim. Kiểm tra backend và kết nối, rồi tải lại trang.");
+        setLoadError("Chưa thể tải danh sách phim. Vui lòng thử lại sau ít phút.");
         console.error("Error fetching movies:", error);
       } finally {
         setLoading(false);
