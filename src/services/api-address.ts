@@ -8,8 +8,7 @@ const addressApi = {
       page,
       size,
     };
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const response = await axios.get(`${backendUrl}/api/v1/addresses`, {
+    const response = await axios.get(`/api/v1/addresses`, {
       params,
     });
     return response;
@@ -19,20 +18,17 @@ const addressApi = {
     street_name: string;
     city: string;
   }) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const response = await axios.post(`${backendUrl}/api/v1/addresses`, data);
+    const response = await axios.post(`/api/v1/addresses`, data);
     return response;
   },
   deleteAddress: async (id: number) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const response = await axios.delete(`${backendUrl}/api/v1/addresses/${id}`);
+    const response = await axios.delete(`/api/v1/addresses/${id}`);
     return response;
   },
 
   getTheaterByAddress: async (id: number) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const response = await axios.get(
-      `${backendUrl}/api/v1/theaters/address/${id}`
+      `/api/v1/theaters/address/${id}`
     );
     return response;
   },
@@ -42,8 +38,7 @@ const addressApi = {
       id,
       ...data,
     };
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const response = await axios.put(`${backendUrl}/api/v1/addresses`, payload);
+    const response = await axios.put(`/api/v1/addresses`, payload);
     return response;
   },
 };

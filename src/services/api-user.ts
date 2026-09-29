@@ -1,15 +1,13 @@
 import axios from "../configs/axios.config";
 const userApi = {
   getAllUsers: async (page?: number, size?: number) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const response = await axios.get(
-      `${backendUrl}/api/v1/users?page=${page}&size=${size}`
+      `/api/v1/users?page=${page}&size=${size}`
     );
     return response;
   },
   getUserById: async (id: number) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const response = await axios.get(`${backendUrl}/api/v1/users/${id}`);
+    const response = await axios.get(`/api/v1/users/${id}`);
     return response;
   },
 
@@ -18,14 +16,12 @@ const userApi = {
       id,
       ...user,
     };
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const response = await axios.put(`${backendUrl}/api/v1/users`, payload);
+    const response = await axios.put(`/api/v1/users`, payload);
     return response;
   },
 
   deleteUser: async (id: number) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const response = await axios.delete(`${backendUrl}/api/v1/users/${id}`);
+    const response = await axios.delete(`/api/v1/users/${id}`);
     return response;
   },
 
@@ -34,9 +30,8 @@ const userApi = {
       currentPassword,
       newPassword,
     };
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const response = await axios.put(
-      `${backendUrl}/api/v1/users/me/password`,
+      `/api/v1/users/me/password`,
       payload
     );
     return response;

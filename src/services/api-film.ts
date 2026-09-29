@@ -8,7 +8,6 @@ const filmApi = {
     name?: string,
     genre?: string
   ) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     const params: any = {
       page,
@@ -33,22 +32,20 @@ const filmApi = {
       params.filter = filters.join(";");
     }
 
-    return axios.get(`${backendUrl}/api/v1/films`, { params });
+    return axios.get(`/api/v1/films`, { params });
   },
 
   createFilm: async (film: ReqFilm) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const response = await axios.post(`${backendUrl}/api/v1/films`, film);
+    const response = await axios.post(`/api/v1/films`, film);
     return response;
   },
 
   uploadImg: async (file: any) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await axios.post(`${backendUrl}/upload`, {
+    const response = await axios.post(`/upload`, {
       formData,
     });
 
@@ -56,26 +53,22 @@ const filmApi = {
   },
 
   updateFilm: async (payload: any) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const response = await axios.put(`${backendUrl}/api/v1/films`, payload);
+    const response = await axios.put(`/api/v1/films`, payload);
     return response;
   },
 
   deleteFilm: async (id: number) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const response = await axios.delete(`${backendUrl}/api/v1/films/${id}`);
+    const response = await axios.delete(`/api/v1/films/${id}`);
     return response;
   },
 
   getFilmById: async (id: number) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const response = await axios.get(`${backendUrl}/api/v1/films/${id}`);
+    const response = await axios.get(`/api/v1/films/${id}`);
     return response;
   },
 
   getFilmByStatus: async (status: string, page: number, size?: number) => {
     const filter = `status='${status}'`;
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const params: any = {
       page,
       sort: "releaseDate,desc",
@@ -84,7 +77,7 @@ const filmApi = {
     if (size !== undefined) {
       params.size = size;
     }
-    const response = await axios.get(`${backendUrl}/api/v1/films`, {
+    const response = await axios.get(`/api/v1/films`, {
       params: params,
     });
     return response;

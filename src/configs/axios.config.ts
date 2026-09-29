@@ -1,7 +1,17 @@
 import axios from "axios";
 
+const rawBackendUrl = import.meta.env.VITE_BACKEND_URL?.trim();
+
+if (!rawBackendUrl) {
+  throw new Error(
+    "Missing VITE_BACKEND_URL. Configure it before building the frontend."
+  );
+}
+
+export const backendUrl = rawBackendUrl.replace(/\/+$/, "");
+
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
+  baseURL: backendUrl,
   withCredentials: true,
   timeout: 15000,
 });

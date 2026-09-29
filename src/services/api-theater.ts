@@ -3,7 +3,6 @@ import axios from "../configs/axios.config";
 
 const theaterApi = {
   getAllTheaters: async (page?: number, size?: number) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const params: any = {
       page,
     };
@@ -12,7 +11,7 @@ const theaterApi = {
       params.size = size;
     }
 
-    const response = await axios.get(`${backendUrl}/api/v1/theaters`, {
+    const response = await axios.get(`/api/v1/theaters`, {
       params,
     });
 
@@ -23,23 +22,20 @@ const theaterApi = {
     name: string,
     addressId: number
   ): Promise<IBackendRes<any>> => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const response = await axios.post(`${backendUrl}/api/v1/theaters`, {
+    const response = await axios.post(`/api/v1/theaters`, {
       name,
       addressId,
     });
     return response;
   },
   getAuditoriumByTheaterId: async (id: number) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const response = await axios.get(
-      `${backendUrl}/api/v1/auditoriums/theater/${id}`
+      `/api/v1/auditoriums/theater/${id}`
     );
     return response;
   },
   removeTheater: async (id: number) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const response = await axios.delete(`${backendUrl}/api/v1/theaters/${id}`);
+    const response = await axios.delete(`/api/v1/theaters/${id}`);
     return response;
   },
 };
