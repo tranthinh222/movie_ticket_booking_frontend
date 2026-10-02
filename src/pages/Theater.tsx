@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router";
 import addressApi from "../services/api-address";
 import { useDebounce } from "../hooks/useDebounce";
 
@@ -309,7 +310,12 @@ const Theater: React.FC = () => {
                       className="group flex flex-col overflow-hidden rounded-2xl bg-[#2a171a] border border-[#482329] hover:border-primary/50 transition-all shadow-xl"
                     >
                       {/* Cinema Header */}
-                      <div className="flex items-start justify-between gap-4 p-5">
+                      <Link
+                        to={`/theater/${theater.id}`}
+                        state={{ theater }}
+                        className="flex items-start justify-between gap-4 p-5 focus-visible:rounded-2xl"
+                        aria-label={`Xem chi tiết ${theater.name}`}
+                      >
                         <div className="flex gap-4">
                           <div className="size-14 shrink-0 overflow-hidden rounded-xl bg-primary/20 flex items-center justify-center text-primary">
                             <span className="material-symbols-outlined text-2xl">
@@ -352,12 +358,10 @@ const Theater: React.FC = () => {
                             </div>
                           </div>
                         </div>
-                        <button className="hidden sm:flex size-10 items-center justify-center rounded-full bg-[#482329] text-white hover:bg-primary transition-colors">
-                          <span className="material-symbols-outlined">
-                            favorite_border
-                          </span>
-                        </button>
-                      </div>
+                        <span className="hidden size-10 shrink-0 items-center justify-center rounded-full bg-[#482329] text-white transition-colors group-hover:bg-primary sm:flex">
+                          <span className="material-symbols-outlined">arrow_forward</span>
+                        </span>
+                      </Link>
 
                       <div className="h-px bg-[#482329] mx-5"></div>
 
@@ -405,21 +409,19 @@ const Theater: React.FC = () => {
 
                       {/* Card Footer */}
                       <div className="mt-auto flex items-center justify-between border-t border-[#482329] bg-[#221114]/50 px-5 py-3">
-                        {/* <a
-                          className="text-sm font-medium text-[#c9929b] hover:text-white transition-colors"
-                          href="#"
-                        >
-                          Xem bản đồ
-                        </a> */}
-                        {/* <Link
+                        <span className="text-xs text-[#c9929b]">
+                          Nhấn để xem thông tin rạp
+                        </span>
+                        <Link
                           to={`/theater/${theater.id}`}
+                          state={{ theater }}
                           className="flex items-center gap-1 text-sm font-bold text-primary hover:text-red-400 transition-colors"
                         >
                           Xem chi tiết rạp{" "}
                           <span className="material-symbols-outlined text-[18px]">
                             arrow_forward
                           </span>
-                        </Link> */}
+                        </Link>
                       </div>
                     </article>
                   ))}

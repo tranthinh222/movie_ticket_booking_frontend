@@ -6,6 +6,7 @@ import Terms from "./pages/Terms.tsx";
 import Privacy from "./pages/Privacy.tsx";
 import Home from "./pages/Home.tsx";
 import Theater from "./pages/Theater.tsx";
+import TheaterDetail from "./pages/TheaterDetail.tsx";
 import Promotion from "./pages/Promotion.tsx";
 import Movie from "./pages/Movie.tsx";
 import News from "./pages/News.tsx";
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
       {
         path: "theater",
         element: <Theater />,
+      },
+      {
+        path: "theater/:id",
+        element: <TheaterDetail />,
       },
       {
         path: "promotion",

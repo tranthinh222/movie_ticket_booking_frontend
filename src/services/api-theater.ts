@@ -18,6 +18,10 @@ const theaterApi = {
     return response;
   },
 
+  getTheaterById: async (id: number) => {
+    return axios.get(`/api/v1/theaters/${id}`);
+  },
+
   createTheater: async (
     name: string,
     addressId: number,
