@@ -3,10 +3,10 @@ import { Link } from "react-router";
 import filmApi from "../services/api-film";
 
 const Home: React.FC = () => {
-  const [nowShowingMovies, setNowShowingMovies] = useState<any[]>([]);
-  const [comingSoonMovies, setComingSoonMovies] = useState<any[]>([]);
+  const [nowShowingMovies, setNowShowingMovies] = useState<IFilm[]>([]);
+  const [comingSoonMovies, setComingSoonMovies] = useState<IFilm[]>([]);
   const [activeTab, setActiveTab] = useState<"NOW_SHOWING" | "COMING_SOON">(
-    "NOW_SHOWING"
+    "NOW_SHOWING",
   );
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -21,19 +21,19 @@ const Home: React.FC = () => {
           filmApi.getFilmByStatus("COMING_SOON", 1, 10),
         ]);
 
-        const nowShowingData =
-          nowShowingRes.data?.data || [];
-        const comingSoonData =
-          comingSoonRes.data?.data || [];
+        const nowShowingData = nowShowingRes.data?.data || [];
+        const comingSoonData = comingSoonRes.data?.data || [];
 
         setNowShowingMovies(
-          Array.isArray(nowShowingData) ? nowShowingData.slice(0, 10) : []
+          Array.isArray(nowShowingData) ? nowShowingData.slice(0, 10) : [],
         );
         setComingSoonMovies(
-          Array.isArray(comingSoonData) ? comingSoonData.slice(0, 10) : []
+          Array.isArray(comingSoonData) ? comingSoonData.slice(0, 10) : [],
         );
       } catch (error) {
-        setLoadError("Chưa thể tải danh sách phim. Vui lòng thử lại sau ít phút.");
+        setLoadError(
+          "Chưa thể tải danh sách phim. Vui lòng thử lại sau ít phút.",
+        );
         console.error("Error fetching homepage movies:", error);
       } finally {
         setLoading(false);
@@ -50,7 +50,12 @@ const Home: React.FC = () => {
       {loadError && (
         <div role="alert" className="p-4 text-center text-white">
           {loadError}
-          <button className="ml-4 text-primary underline" onClick={() => window.location.reload()}>Thử lại</button>
+          <button
+            className="ml-4 text-primary underline"
+            onClick={() => window.location.reload()}
+          >
+            Thử lại
+          </button>
         </div>
       )}
       {/* Hero Section */}
@@ -201,7 +206,7 @@ const Home: React.FC = () => {
                         ? movie.genre?.split(",")[0] || "Phim"
                         : movie.releaseDate
                           ? new Date(movie.releaseDate).toLocaleDateString(
-                              "vi-VN"
+                              "vi-VN",
                             )
                           : "Sắp ra mắt"}
                     </p>

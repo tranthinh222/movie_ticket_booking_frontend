@@ -21,7 +21,26 @@ interface ITicket {
   discountCode?: string;
   discountAmount?: number;
   status: TicketStatus;
+  qrCode?: string | null;
+}
+
+interface BookingHistoryItem {
+  id: number;
+  film?: { name?: string; thumbnail?: string };
+  theater?: { name?: string };
+  showtime?: { auditoriumNumber?: string; date?: string; startTime?: string };
+  seats?: Array<{ seatRow?: string; number?: number }>;
+  paymentId?: number;
+  total_price?: number;
+  discountCode?: string;
+  discountAmount?: number;
+  status?: TicketStatus;
   qrCode?: string;
+}
+
+interface BookingHistoryResponse {
+  data: BookingHistoryItem[];
+  meta?: { totalPages?: number };
 }
 
 const BookingHistory: React.FC = () => {
@@ -42,15 +61,17 @@ const BookingHistory: React.FC = () => {
         const res = await bookingApi.getUserBooking(user.id, currentPage, size);
 
         // Handle paginated response structure
-        const responseData = (res as any).data || res;
-        const data = responseData.data || [];
-        const meta = responseData.meta || {};
+        const wrapped = res as unknown as { data?: BookingHistoryResponse };
+        const responseData =
+          wrapped.data ?? (res as unknown as BookingHistoryResponse);
+        const data = responseData.data ?? [];
+        const meta = responseData.meta ?? {};
 
         if (meta.totalPages) {
           setTotalPages(meta.totalPages);
         }
 
-        const mapped: ITicket[] = data.map((b: any) => {
+        const mapped: ITicket[] = data.map((b) => {
           return {
             id: String(b.id),
             movieName: b.film?.name ?? "",
@@ -62,8 +83,7 @@ const BookingHistory: React.FC = () => {
             date: b.showtime?.date ?? "",
             time: b.showtime?.startTime?.slice(0, 5) ?? "",
             seats:
-              b.seats?.map((s: any) => `${s.seatRow ?? ""}${s.number ?? ""}`) ??
-              [],
+              b.seats?.map((s) => `${s.seatRow ?? ""}${s.number ?? ""}`) ?? [],
             bookingCode: b.paymentId ?? null,
             totalPrice: b.total_price ?? 0,
             discountCode: b.discountCode,
@@ -314,11 +334,6 @@ const BookingHistory: React.FC = () => {
                             qr_code_2
                           </span>
                           Mã QR
-                        </button>
-                      )}
-                      {ticket.status === "CANCELLED" && (
-                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white text-sm font-medium transition-colors">
-                          Xem chi tiết
                         </button>
                       )}
                     </div>

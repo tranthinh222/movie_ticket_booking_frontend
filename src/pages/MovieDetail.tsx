@@ -101,19 +101,19 @@ const MovieDetail: React.FC = () => {
           <div className="layout-content-container max-w-[1200px] w-full mx-auto px-4 md:px-10 relative z-20 pt-4">
             {/* Breadcrumbs */}
             <div className="flex flex-wrap gap-2 py-4 mb-4">
-              <a
+              <Link
                 className="text-gray-300 text-sm font-medium hover:text-white transition-colors"
-                href="/"
+                to="/"
               >
                 Trang chủ
-              </a>
+              </Link>
               <span className="text-gray-500 text-sm font-medium">/</span>
-              <a
+              <Link
                 className="text-gray-300 text-sm font-medium hover:text-white transition-colors"
-                href="/movies"
+                to="/movie"
               >
                 Phim đang chiếu
-              </a>
+              </Link>
               <span className="text-gray-500 text-sm font-medium">/</span>
               <span className="text-white text-sm font-medium">
                 {film.name}
@@ -180,12 +180,12 @@ const MovieDetail: React.FC = () => {
 
                 {/* Actions */}
                 <div className="flex flex-col md:flex-row items-center gap-8 mb-8">
-                  <button className="flex items-center gap-2 px-6 h-12 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold transition-all border border-white/20 backdrop-blur-md">
+                  <span className="flex items-center gap-2 px-6 h-12 rounded-lg bg-white/5 text-gray-400 font-bold border border-white/10">
                     <span className="material-symbols-outlined">
                       play_circle
                     </span>
-                    Trailer
-                  </button>
+                    Trailer đang cập nhật
+                  </span>
                   <Link
                     to={`booking`}
                     className="flex items-center gap-2 px-8 h-12 rounded-lg bg-primary hover:bg-red-600 text-white font-bold shadow-lg shadow-primary/30 transition-all transform hover:-translate-y-0.5"
@@ -228,7 +228,7 @@ const MovieDetail: React.FC = () => {
                 <h3 className="text-white text-xl font-bold mb-4 flex items-center gap-2 border-l-4 border-primary pl-3">
                   Trailer
                 </h3>
-                <div className="aspect-video w-full rounded-xl overflow-hidden bg-black relative group cursor-pointer">
+                <div className="aspect-video w-full rounded-xl overflow-hidden bg-black relative group">
                   <img
                     className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity"
                     alt="Trailer thumbnail"
@@ -238,10 +238,8 @@ const MovieDetail: React.FC = () => {
                     }
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="size-16 rounded-full bg-primary/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <span className="material-symbols-outlined text-[32px]">
-                        play_arrow
-                      </span>
+                    <div className="rounded-full bg-black/70 px-5 py-3 text-sm font-semibold text-white">
+                      Trailer đang được cập nhật
                     </div>
                   </div>
                 </div>

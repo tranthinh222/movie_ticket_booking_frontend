@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import authApi from "../services/api-auth";
 import { message } from "antd";
+import { getApiErrorMessage } from "../utils/api-error";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -34,8 +35,8 @@ const ResetPassword = () => {
       await authApi.resetPassword(resetToken, password);
       message.success("Đặt lại mật khẩu thành công!");
       navigate("/login");
-    } catch (error: any) {
-      message.error(error.message || "Đổi mật khẩu thất bại!");
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, "Đổi mật khẩu thất bại!"));
     } finally {
       setLoading(false);
     }

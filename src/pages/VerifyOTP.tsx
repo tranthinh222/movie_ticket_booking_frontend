@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import authApi from "../services/api-auth";
 import { message } from "antd";
+import { getApiErrorMessage } from "../utils/api-error";
 
 const VerifyOTP = () => {
   const navigate = useNavigate();
@@ -38,8 +39,10 @@ const VerifyOTP = () => {
       message.success("Mã xác thực đã được gửi lại!");
       setTimer(30);
       setOtp(["", "", "", "", "", ""]);
-    } catch (error: any) {
-      message.error(error.message || "Gửi mã thất bại. Vui lòng thử lại!");
+    } catch (error: unknown) {
+      message.error(
+        getApiErrorMessage(error, "Gửi mã thất bại. Vui lòng thử lại!"),
+      );
     } finally {
       setLoading(false);
     }
@@ -79,8 +82,8 @@ const VerifyOTP = () => {
       } else {
         message.error("Không tìm thấy mã đặt lại mật khẩu!");
       }
-    } catch (error: any) {
-      message.error(error.message || "Mã xác thực không chính xác!");
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, "Mã xác thực không chính xác!"));
     } finally {
       setLoading(false);
     }

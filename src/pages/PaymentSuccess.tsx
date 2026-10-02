@@ -3,19 +3,43 @@ import { Link, useLocation, useSearchParams } from "react-router";
 import bookingApi from "../services/api-booking";
 
 interface PaymentState {
-  movie: IFilm;
-  cinema: ITheater;
-  showtime: IShowtime;
-  seats: IShowtimeSeat[];
+  id?: number;
+  movie: { name: string; thumbnail?: string };
+  cinema: { name: string };
+  showtime: {
+    date: string;
+    startTime: string;
+    auditorium?: { number?: number | string };
+  };
+  seats: Array<{ seatRow: string; number: number }>;
   totalPrice: number;
   paymentMethod?: string;
+  qrCode?: string;
+}
+
+interface BookingDetailsResponse {
+  statusCode?: number | string;
+  data?: {
+    id?: number;
+    film?: { name?: string; thumbnail?: string };
+    theater?: { name?: string };
+    showtime?: {
+      date?: string;
+      startTime?: string;
+      auditoriumNumber?: string;
+    };
+    seats?: Array<{ seatRow: string; number: number }>;
+    total_price?: number;
+    paymentMethod?: string;
+    qrCode?: string;
+  };
 }
 
 const PaymentSuccess: React.FC = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const [bookingData, setBookingData] = React.useState<PaymentState | null>(
-    location.state as PaymentState | null
+    location.state as PaymentState | null,
   );
   const bookingId = searchParams.get("bookingId");
 
@@ -25,13 +49,14 @@ const PaymentSuccess: React.FC = () => {
   React.useEffect(() => {
     const fetchBooking = async () => {
       // Fetch if we have an ID AND either no data or it's a direct link (no location.state)
-      if (bookingId && (!bookingData || !location.state)) {
+      if (bookingId && !location.state) {
         setLoading(true);
         try {
-          const response = await bookingApi.getBookingById(parseInt(bookingId));
-          // Handle both wrapped and unwrapped responses
-          const actualData = (response as any).data || response;
-          const statusCode = (response as any).statusCode || 200;
+          const response = (await bookingApi.getBookingById(
+            parseInt(bookingId),
+          )) as unknown as BookingDetailsResponse;
+          const actualData = response.data;
+          const statusCode = response.statusCode ?? 200;
 
           if (
             actualData &&
@@ -40,60 +65,28 @@ const PaymentSuccess: React.FC = () => {
               statusCode === "200" ||
               statusCode === "201")
           ) {
-            const data = actualData as any;
-
-            // Flexible mapping to handle different potential backend structures
+            const data = actualData;
             const mappedData: PaymentState = {
-              movie: data.film || {
-                name:
-                  data.showtime?.filmName ||
-                  data.filmName ||
-                  data.showtime?.film?.name ||
-                  data.movieName ||
-                  "N/A",
-                thumbnail:
-                  data.showtime?.film?.thumbnail ||
-                  data.thumbnail ||
-                  data.movie?.thumbnail ||
-                  "",
+              id: data.id,
+              movie: {
+                name: data.film?.name ?? "Chưa cập nhật",
+                thumbnail: data.film?.thumbnail,
               },
-              cinema: data.theater || {
-                name:
-                  data.showtime?.cinemaName ||
-                  data.cinemaName ||
-                  data.showtime?.auditorium?.theater?.name ||
-                  data.theaterName ||
-                  "CineMovie Cinema",
+              cinema: {
+                name: data.theater?.name ?? "Chưa cập nhật",
               },
               showtime: {
-                ...data.showtime,
-                startTime: data.showtime?.startTime || data.startTime || "",
-                date: data.showtime?.date || data.date || "",
+                startTime: data.showtime?.startTime ?? "",
+                date: data.showtime?.date ?? "",
                 auditorium: {
-                  number:
-                    data.showtime?.auditoriumNumber ||
-                    data.showtime?.auditoriumName ||
-                    data.auditoriumName ||
-                    data.showtime?.auditorium?.number ||
-                    "0",
+                  number: data.showtime?.auditoriumNumber,
                 },
-              } as any,
-              seats: data.seats || [],
-              totalPrice:
-                data.total_price || data.totalPrice || data.total_money || 0,
-              paymentMethod:
-                data.paymentMethod || data.payment_method || data.method || "",
+              },
+              seats: data.seats ?? [],
+              totalPrice: data.total_price ?? 0,
+              paymentMethod: data.paymentMethod,
+              qrCode: data.qrCode,
             };
-
-            // Capture potential qrCode from data
-            if (data.qrCode) {
-              (mappedData as any).qrCode = data.qrCode;
-            }
-            if (data.id) {
-              (mappedData as any).id = data.id;
-            }
-
-            // Set data even if some fields are missing, let the UI handle empty states
             setBookingData(mappedData);
           }
         } catch (error) {
@@ -132,7 +125,7 @@ const PaymentSuccess: React.FC = () => {
   }
 
   const { movie, cinema, showtime, seats } = bookingData;
-  const apiQrCode = (bookingData as any).qrCode;
+  const apiQrCode = bookingData.qrCode;
 
   return (
     <div className="min-h-screen bg-[#1a0b0d] text-white flex items-center justify-center p-4 md:p-8">
@@ -217,7 +210,7 @@ const PaymentSuccess: React.FC = () => {
                     Rạp chiếu
                   </span>
                   <p className="font-black text-white">
-                    {cinema?.name || "N/A"}
+                    {cinema?.name || "Chưa cập nhật"}
                   </p>
                   <p className="text-[#c9929b] text-[10px]">
                     {showtime?.auditorium?.number
@@ -232,7 +225,7 @@ const PaymentSuccess: React.FC = () => {
                   <p className="font-black text-primary uppercase">
                     {seats?.length > 0
                       ? seats.map((s) => `${s.seatRow}${s.number}`).join(", ")
-                      : "N/A"}
+                      : "Chưa cập nhật"}
                   </p>
                 </div>
                 <div className="flex flex-col gap-1 text-right">
@@ -264,16 +257,17 @@ const PaymentSuccess: React.FC = () => {
                         </p>
                       </div>
                     </div>
-                  ) : (
+                  ) : apiQrCode ? (
                     <img
-                      src={
-                        apiQrCode
-                          ? `data:image/png;base64,${apiQrCode}`
-                          : `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=CineMovie-Booking-${bookingId || (bookingData as any).id}`
-                      }
+                      src={`data:image/png;base64,${apiQrCode}`}
                       alt="QR Code"
                       className="size-48 md:size-56 object-contain"
                     />
+                  ) : (
+                    <div className="text-center text-sm font-semibold text-gray-700">
+                      Mã QR chưa được phát hành. Vui lòng kiểm tra lại trong
+                      lịch sử đặt vé.
+                    </div>
                   )}
                 </div>
                 <p className="text-[11px] text-[#c9929b] text-center max-w-[200px] leading-relaxed">
@@ -290,9 +284,7 @@ const PaymentSuccess: React.FC = () => {
                 </span>
                 <span className="text-[10px] font-mono">
                   #TRX-
-                  {bookingId ||
-                    (bookingData as any).id ||
-                    Math.floor(10000000 + Math.random() * 90000000)}
+                  {bookingId || bookingData.id || "Chưa có"}
                 </span>
               </div>
             </div>

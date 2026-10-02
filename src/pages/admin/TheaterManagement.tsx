@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import {
   Table,
@@ -46,6 +47,7 @@ const PAGE_SIZE = 5;
 const TheaterManagement: React.FC = () => {
   const [theaters, setTheaters] = useState<Theater[]>([]);
   const [open, setOpen] = useState(false);
+  const [editingTheater, setEditingTheater] = useState<Theater | null>(null);
   const [loading, setLoading] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,21 +85,39 @@ const TheaterManagement: React.FC = () => {
     fetchAllLocation();
   }, []);
 
-  const handleCreateTheater = async () => {
+  const handleSubmitTheater = async () => {
     try {
       const values = await form.validateFields();
-      const res = await theaterApi.createTheater(values.name, values.addressId);
-      if (res.statusCode === 201) {
-        message.success("Tạo rạp chiếu thành công!");
-        fetchTheaters();
+      if (editingTheater) {
+        await theaterApi.updateTheater(editingTheater.id, values.name);
+        message.success("Cập nhật rạp chiếu thành công!");
       } else {
-        message.error("Tạo rạp chiếu thất bại");
+        await theaterApi.createTheater(values.name, Number(values.addressId));
+        message.success("Tạo rạp chiếu thành công!");
       }
       setOpen(false);
+      setEditingTheater(null);
       form.resetFields();
-    } catch (err) {
-      console.log("Validate failed:", err);
+      fetchTheaters();
+    } catch {
+      message.error(
+        editingTheater
+          ? "Cập nhật rạp chiếu thất bại"
+          : "Tạo rạp chiếu thất bại",
+      );
     }
+  };
+
+  const openCreateModal = () => {
+    setEditingTheater(null);
+    form.resetFields();
+    setOpen(true);
+  };
+
+  const openEditModal = (theater: Theater) => {
+    setEditingTheater(theater);
+    form.setFieldsValue({ name: theater.name });
+    setOpen(true);
   };
 
   const handleDeleteTheater = async (id: number) => {
@@ -136,7 +156,7 @@ const TheaterManagement: React.FC = () => {
             <Text type="secondary">{record.address.city}</Text>
           </div>
         ) : (
-          <Text type="secondary">N/A</Text>
+          <Text type="secondary">Chưa cập nhật</Text>
         ),
     },
     {
@@ -150,7 +170,12 @@ const TheaterManagement: React.FC = () => {
       align: "right" as const,
       render: (_: unknown, record: Theater) => (
         <Space>
-          <Button icon={<EditOutlined />} type="text" />
+          <Button
+            icon={<EditOutlined />}
+            type="text"
+            aria-label={`Sửa ${record.name}`}
+            onClick={() => openEditModal(record)}
+          />
           <Popconfirm
             title="Xóa rạp chiếu"
             description="Bạn có chắc muốn xóa rạp chiếu này?"
@@ -187,7 +212,7 @@ const TheaterManagement: React.FC = () => {
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => setOpen(true)}
+          onClick={openCreateModal}
         >
           Thêm rạp mới
         </Button>
@@ -201,6 +226,7 @@ const TheaterManagement: React.FC = () => {
         columns={columns}
         pagination={false}
         bordered
+        scroll={{ x: 720 }}
       />
 
       {/* PAGINATION */}
@@ -229,12 +255,16 @@ const TheaterManagement: React.FC = () => {
       {/* MODAL CREATE THEATER */}
       <Modal
         open={open}
-        onCancel={() => setOpen(false)}
-        title="Tạo rạp chiếu mới"
-        okText="Tạo"
+        onCancel={() => {
+          setOpen(false);
+          setEditingTheater(null);
+          form.resetFields();
+        }}
+        title={editingTheater ? "Cập nhật rạp chiếu" : "Tạo rạp chiếu mới"}
+        okText={editingTheater ? "Cập nhật" : "Tạo"}
         cancelText="Hủy"
         destroyOnClose
-        onOk={handleCreateTheater}
+        onOk={handleSubmitTheater}
       >
         <Form layout="vertical" form={form}>
           <Form.Item
@@ -245,19 +275,21 @@ const TheaterManagement: React.FC = () => {
             <Input />
           </Form.Item>
 
-          <Form.Item
-            label="Địa chỉ"
-            name="addressId"
-            rules={[{ required: true, message: "Vui lòng chọn địa chỉ" }]}
-          >
-            <Select>
-              {addresses.map((v: Address) => (
-                <Select.Option key={v.id} value={String(v.id)}>
-                  {v.city}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+          {!editingTheater && (
+            <Form.Item
+              label="Địa chỉ"
+              name="addressId"
+              rules={[{ required: true, message: "Vui lòng chọn địa chỉ" }]}
+            >
+              <Select placeholder="Chọn địa chỉ">
+                {addresses.map((v: Address) => (
+                  <Select.Option key={v.id} value={v.id}>
+                    {v.street_number} {v.street_name}, {v.city}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          )}
         </Form>
       </Modal>
     </div>

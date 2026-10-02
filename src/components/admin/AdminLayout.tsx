@@ -84,7 +84,7 @@ const AdminLayout: React.FC = () => {
     if (path === "/admin") return ["/admin"];
     // Find matching menu item
     const matchedItem = menuItems?.find(
-      (item) => item?.key !== "/admin" && path.startsWith(item?.key as string)
+      (item) => item?.key !== "/admin" && path.startsWith(item?.key as string),
     );
     return matchedItem ? [matchedItem.key as string] : ["/admin"];
   };
@@ -94,6 +94,8 @@ const AdminLayout: React.FC = () => {
       {/* Sidebar */}
       <Sider
         width={256}
+        breakpoint="lg"
+        collapsedWidth={0}
         theme="light"
         style={{
           borderRight: "1px solid #f0f0f0",
@@ -192,7 +194,7 @@ const AdminLayout: React.FC = () => {
       <Content
         style={{
           background: "#f5f5f5",
-          padding: 24,
+          padding: "clamp(12px, 3vw, 24px)",
           overflow: "auto",
         }}
       >

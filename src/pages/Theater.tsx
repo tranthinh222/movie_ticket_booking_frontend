@@ -18,7 +18,7 @@ interface ITheaterData {
 const Theater: React.FC = () => {
   const [addresses, setAddresses] = useState<IAddress[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
-    null
+    null,
   );
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
 
@@ -77,7 +77,7 @@ const Theater: React.FC = () => {
     // Filter by search query
     if (debouncedSearch.trim()) {
       filtered = filtered.filter((theater) =>
-        theater.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+        theater.name.toLowerCase().includes(debouncedSearch.toLowerCase()),
       );
     }
 
@@ -333,7 +333,7 @@ const Theater: React.FC = () => {
                                 <span className="material-symbols-outlined text-[12px]">
                                   near_me
                                 </span>
-                                {theater.address?.city || "N/A"}
+                                {theater.address?.city || "Chưa cập nhật"}
                               </span>
                               <div className="flex gap-0.5">
                                 {[1, 2, 3, 4, 5].map((star) => (
@@ -374,7 +374,7 @@ const Theater: React.FC = () => {
                             <span className="text-sm">
                               Địa chỉ:{" "}
                               <span className="text-white">
-                                {theater.address?.street_number || "N/A"}
+                                {theater.address?.street_number || "Chưa cập nhật"}
                               </span>
                             </span>
                           </div>
@@ -385,7 +385,7 @@ const Theater: React.FC = () => {
                             <span className="text-sm">
                               Đường:{" "}
                               <span className="text-white">
-                                {theater.address?.street_name || "N/A"}
+                                {theater.address?.street_name || "Chưa cập nhật"}
                               </span>
                             </span>
                           </div>
@@ -396,7 +396,7 @@ const Theater: React.FC = () => {
                             <span className="text-sm">
                               Thành phố:{" "}
                               <span className="text-white">
-                                {theater.address?.city || "N/A"}
+                                {theater.address?.city || "Chưa cập nhật"}
                               </span>
                             </span>
                           </div>

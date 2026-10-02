@@ -134,7 +134,7 @@ const AdminDashboard: React.FC = () => {
         setRevenueLoading(true);
         const res = await bookingApi.getTotalRevenue(
           selectedMonth,
-          selectedYear
+          selectedYear,
         );
         setRevenueData({
           totalRevenue: res.data.totalRevenue || 0,

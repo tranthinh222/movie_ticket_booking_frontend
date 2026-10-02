@@ -47,6 +47,7 @@ declare global {
     language: string;
     releaseDate: string | Date;
     rating: number;
+    status?: "COMING_SOON" | "NOW_SHOWING" | "STOPPED";
   }
 
   interface ReqShowtime {
@@ -108,6 +109,7 @@ declare global {
     language: string;
     releaseDate: string;
     rating: number;
+    status?: "COMING_SOON" | "NOW_SHOWING" | "STOPPED";
     thumbnail?: string;
     createdAt?: string;
     updatedAt?: string | null;

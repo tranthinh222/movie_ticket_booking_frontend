@@ -1,31 +1,31 @@
-import { Link } from 'react-router'
+import { Link } from "react-router";
 
 const sections = [
   [
-    'Thông tin tài khoản',
-    'CineMovie sử dụng thông tin bạn cung cấp khi đăng ký và cập nhật hồ sơ để quản lý tài khoản, hỗ trợ đăng nhập và khôi phục mật khẩu.',
+    "Thông tin tài khoản",
+    "CineMovie sử dụng thông tin bạn cung cấp khi đăng ký và cập nhật hồ sơ để quản lý tài khoản, hỗ trợ đăng nhập và khôi phục mật khẩu.",
   ],
   [
-    'Thông tin đặt vé',
-    'Phim, rạp, suất chiếu, ghế, số tiền và trạng thái đặt vé được lưu để xử lý đơn hàng và hiển thị lịch sử đặt vé của bạn.',
+    "Thông tin đặt vé",
+    "Phim, rạp, suất chiếu, ghế, số tiền và trạng thái đặt vé được lưu để xử lý đơn hàng và hiển thị lịch sử đặt vé của bạn.",
   ],
   [
-    'Thanh toán',
-    'Khi chọn thanh toán trực tuyến, bạn được chuyển đến cổng thanh toán để thực hiện giao dịch. Hãy kiểm tra thông tin đơn hàng và chính sách của cổng thanh toán trước khi xác nhận.',
+    "Thanh toán",
+    "Khi chọn thanh toán trực tuyến, bạn được chuyển đến cổng thanh toán để thực hiện giao dịch. Hãy kiểm tra thông tin đơn hàng và chính sách của cổng thanh toán trước khi xác nhận.",
   ],
   [
-    'Trò chuyện với trợ lý',
-    'Khi gửi yêu cầu bằng ngôn ngữ tự nhiên, tin nhắn, lịch sử hội thoại gần đây và điều kiện tìm kiếm được gửi đến dịch vụ Gemini để hiểu yêu cầu. Không gửi mật khẩu, thông tin thẻ hoặc dữ liệu nhạy cảm trong chat. Bạn có thể bấm Trò chuyện mới để xóa ngữ cảnh hội thoại đang giữ trên giao diện.',
+    "Trò chuyện với trợ lý",
+    "Khi gửi yêu cầu bằng ngôn ngữ tự nhiên, tin nhắn, lịch sử hội thoại gần đây và điều kiện tìm kiếm được gửi đến dịch vụ Gemini để hiểu yêu cầu. Không gửi mật khẩu, thông tin thẻ hoặc dữ liệu nhạy cảm trong chat. Bạn có thể bấm Trò chuyện mới để xóa ngữ cảnh hội thoại đang giữ trên giao diện.",
   ],
   [
-    'Dịch vụ hình ảnh',
-    'Ảnh được tải lên qua chức năng của ứng dụng được xử lý bởi dịch vụ lưu trữ Cloudinary để hiển thị trên CineMovie.',
+    "Dịch vụ hình ảnh",
+    "Ảnh được tải lên qua chức năng của ứng dụng được xử lý bởi dịch vụ lưu trữ Cloudinary để hiển thị trên CineMovie.",
   ],
   [
-    'Quản lý thông tin của bạn',
-    'Bạn có thể xem và chỉnh sửa thông tin trong trang tài khoản, đổi mật khẩu và xem lịch sử đặt vé. Hãy đăng xuất khi sử dụng thiết bị dùng chung.',
+    "Quản lý thông tin của bạn",
+    "Bạn có thể xem và chỉnh sửa thông tin trong trang tài khoản, đổi mật khẩu và xem lịch sử đặt vé. Hãy đăng xuất khi sử dụng thiết bị dùng chung.",
   ],
-]
+];
 
 export default function Privacy() {
   return (
@@ -58,5 +58,5 @@ export default function Privacy() {
         Quản lý tài khoản →
       </Link>
     </article>
-  )
+  );
 }

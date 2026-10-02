@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import {
   Table,
@@ -244,9 +245,9 @@ const FilmManagement = () => {
       >
         <div>
           <Title level={3} style={{ marginBottom: 0 }}>
-            Films
+            Phim
           </Title>
-          <Text type="secondary">Manage movies</Text>
+          <Text type="secondary">Quản lý danh sách phim</Text>
         </div>
 
         <Button
@@ -254,7 +255,7 @@ const FilmManagement = () => {
           icon={<PlusOutlined />}
           onClick={() => handleOpenModal()}
         >
-          New Film
+          Thêm phim
         </Button>
       </div>
 
@@ -275,18 +276,18 @@ const FilmManagement = () => {
             disabled={currentPage === 1}
             onClick={() => setCurrentPage((p) => p - 1)}
           >
-            Prev
+            Trước
           </Button>
 
           <Text>
-            Page {currentPage} / {totalPages}
+            Trang {currentPage} / {totalPages}
           </Text>
 
           <Button
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage((p) => p + 1)}
           >
-            Next
+            Sau
           </Button>
         </Space>
       </div>
@@ -327,7 +328,7 @@ const FilmManagement = () => {
                 return false;
               }}
             >
-              <Button icon={<UploadOutlined />}>Upload image</Button>
+              <Button icon={<UploadOutlined />}>Tải ảnh lên</Button>
             </Upload>
 
             {posterPreview && (

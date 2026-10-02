@@ -1,9 +1,7 @@
 import axios from "../configs/axios.config";
 const userApi = {
   getAllUsers: async (page?: number, size?: number) => {
-    const response = await axios.get(
-      `/api/v1/users?page=${page}&size=${size}`
-    );
+    const response = await axios.get(`/api/v1/users?page=${page}&size=${size}`);
     return response;
   },
   getUserById: async (id: number) => {
@@ -11,7 +9,12 @@ const userApi = {
     return response;
   },
 
-  updateUser: async (id: number, user: any) => {
+  updateUser: async (
+    id: number,
+    user: Partial<
+      Pick<IFetchUserRes, "username" | "phone" | "role" | "gender" | "avatar">
+    >,
+  ) => {
     const payload = {
       id,
       ...user,
@@ -30,10 +33,7 @@ const userApi = {
       currentPassword,
       newPassword,
     };
-    const response = await axios.put(
-      `/api/v1/users/me/password`,
-      payload
-    );
+    const response = await axios.put(`/api/v1/users/me/password`, payload);
     return response;
   },
 };

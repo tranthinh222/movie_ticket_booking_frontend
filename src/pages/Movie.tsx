@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import filmApi from "../services/api-film";
 
 const Movie: React.FC = () => {
-  const [nowShowingMovies, setNowShowingMovies] = useState<any[]>([]);
-  const [comingSoonMovies, setComingSoonMovies] = useState<any[]>([]);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const search = searchParams.get("search")?.trim() || undefined;
+  const [nowShowingMovies, setNowShowingMovies] = useState<IFilm[]>([]);
+  const [comingSoonMovies, setComingSoonMovies] = useState<IFilm[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -14,23 +17,27 @@ const Movie: React.FC = () => {
       setLoadError(null);
       try {
         const [nowShowingRes, comingSoonRes] = await Promise.all([
-          filmApi.getFilmByStatus("NOW_SHOWING", 1, 40),
-          filmApi.getFilmByStatus("COMING_SOON", 1, 40),
+          filmApi.getAllFilms(1, 40, search, undefined),
+          filmApi.getAllFilms(1, 40, search, undefined),
         ]);
 
-        const nowShowingData =
-          nowShowingRes.data?.data || [];
-        const comingSoonData =
-          comingSoonRes.data?.data || [];
+        const nowShowingData = nowShowingRes.data?.data || [];
+        const comingSoonData = comingSoonRes.data?.data || [];
 
         setNowShowingMovies(
-          nowShowingData.filter((m: any) => m.status === "NOW_SHOWING")
+          nowShowingData.filter(
+            (movie: IFilm) => movie.status === "NOW_SHOWING",
+          ),
         );
         setComingSoonMovies(
-          comingSoonData.filter((m: any) => m.status === "COMING_SOON")
+          comingSoonData.filter(
+            (movie: IFilm) => movie.status === "COMING_SOON",
+          ),
         );
       } catch (error) {
-        setLoadError("Chưa thể tải danh sách phim. Vui lòng thử lại sau ít phút.");
+        setLoadError(
+          "Chưa thể tải danh sách phim. Vui lòng thử lại sau ít phút.",
+        );
         console.error("Error fetching movies:", error);
       } finally {
         setLoading(false);
@@ -38,7 +45,7 @@ const Movie: React.FC = () => {
     };
 
     fetchMovies();
-  }, []);
+  }, [search]);
 
   const featuredMovies = nowShowingMovies.slice(0, 3);
 
@@ -57,10 +64,59 @@ const Movie: React.FC = () => {
 
   return (
     <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-10 py-6 space-y-10">
+      <form
+        className="sm:hidden"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const formData = new FormData(event.currentTarget);
+          const keyword = String(formData.get("search") ?? "").trim();
+          navigate(
+            keyword ? `/movie?search=${encodeURIComponent(keyword)}` : "/movie",
+          );
+        }}
+      >
+        <label className="sr-only" htmlFor="mobile-movie-search">
+          Tìm tên phim
+        </label>
+        <div className="flex gap-2">
+          <input
+            id="mobile-movie-search"
+            name="search"
+            defaultValue={search}
+            placeholder="Tìm tên phim..."
+            className="min-w-0 flex-1 rounded-lg border border-[#482329] bg-[#2f161a] px-4 py-3 text-white placeholder:text-[#c9929b]"
+          />
+          <button
+            type="submit"
+            className="rounded-lg bg-primary px-4 text-white"
+            aria-label="Tìm kiếm"
+          >
+            <span className="material-symbols-outlined">search</span>
+          </button>
+        </div>
+      </form>
+      {search && (
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-xl font-bold text-white">
+            Kết quả cho “{search}”
+          </h1>
+          <Link className="text-sm text-primary hover:underline" to="/movie">
+            Xóa tìm kiếm
+          </Link>
+        </div>
+      )}
       {loadError && (
-        <div role="alert" className="rounded-xl border border-primary p-4 text-white">
+        <div
+          role="alert"
+          className="rounded-xl border border-primary p-4 text-white"
+        >
           {loadError}
-          <button className="ml-4 text-primary underline" onClick={() => window.location.reload()}>Thử lại</button>
+          <button
+            className="ml-4 text-primary underline"
+            onClick={() => window.location.reload()}
+          >
+            Thử lại
+          </button>
         </div>
       )}
       {/* Section 1: Phim đang chiếu */}
@@ -160,7 +216,7 @@ const Movie: React.FC = () => {
                 ></div>
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 pt-12">
                   <p className="text-primary font-bold text-xs uppercase tracking-wider mb-1">
-                    Coming Soon
+                    Sắp chiếu
                   </p>
                   <p className="text-white font-bold text-sm">
                     {movie.releaseDate

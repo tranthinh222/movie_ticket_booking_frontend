@@ -3,6 +3,8 @@ import { useRouteError, Link } from "react-router";
 
 const GeneralError: React.FC = () => {
   const error = useRouteError();
+  const errorMessage =
+    error instanceof Error ? error.message : JSON.stringify(error);
   console.error(error);
 
   return (
@@ -38,7 +40,7 @@ const GeneralError: React.FC = () => {
           <p className="font-bold mb-2 uppercase text-white/50 border-b border-white/10 pb-1">
             Developer Info (Dev Only):
           </p>
-          {(error as any)?.message || JSON.stringify(error)}
+          {errorMessage}
         </div>
       )}
     </div>

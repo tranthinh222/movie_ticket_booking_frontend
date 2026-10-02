@@ -54,15 +54,23 @@ const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await authApi.register(username.trim(), email.trim(), password);
+      const response = await authApi.register(
+        username.trim(),
+        email.trim(),
+        password,
+      );
 
       if (response.statusCode === 200 || response.statusCode === 201) {
         // Registration successful, redirect to homepage
-        message.success("Đăng ký thành công. Bạn có thể đăng nhập bằng tài khoản vừa tạo.");
+        message.success(
+          "Đăng ký thành công. Bạn có thể đăng nhập bằng tài khoản vừa tạo.",
+        );
         navigate("/login");
       } else {
         // Handle error from backend
-        setError(getApiErrorMessage(response, "Đăng ký thất bại. Vui lòng thử lại."));
+        setError(
+          getApiErrorMessage(response, "Đăng ký thất bại. Vui lòng thử lại."),
+        );
       }
     } catch (err: unknown) {
       setError(getApiErrorMessage(err, "Đăng ký thất bại. Vui lòng thử lại."));

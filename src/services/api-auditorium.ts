@@ -3,7 +3,6 @@ import axios from "../configs/axios.config";
 
 const auditoriumApi = {
   getAllAuditorium: async (page: number, size?: number) => {
-
     const params: any = {
       page,
     };
@@ -19,9 +18,7 @@ const auditoriumApi = {
     return response;
   },
   getAllByOfAuditorium: async (id: number) => {
-    const response = await axios.get(
-      `/api/v1/seats/auditorium/${id}`
-    );
+    const response = await axios.get(`/api/v1/seats/auditorium/${id}`);
     return response;
   },
   createAuditorium: async (data: { number: number; theaterId: number }) => {
@@ -31,14 +28,12 @@ const auditoriumApi = {
 
   getAuditoriumsByTheater: async (theaterId: number) => {
     const response = await axios.get(
-      `/api/v1/auditoriums/theater/${theaterId}`
+      `/api/v1/auditoriums/theater/${theaterId}`,
     );
     return response;
   },
   deleteAuditorium: async (id: number) => {
-    const response = await axios.delete(
-      `/api/v1/auditoriums/${id}`
-    );
+    const response = await axios.delete(`/api/v1/auditoriums/${id}`);
     return response;
   },
 };

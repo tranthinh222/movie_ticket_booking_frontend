@@ -4,7 +4,7 @@ import addressApi from "../services/api-address";
 import showtimeApi from "../services/api-showtime";
 import seatApi from "../services/api-seat";
 import filmApi from "../services/api-film";
-import {useAssistantContext} from "../components/chat/assistant-context";
+import { useAssistantContext } from "../components/chat/assistant-context";
 
 // Extended seat type for UI state
 interface SeatWithSelection extends IShowtimeSeat {
@@ -32,10 +32,10 @@ const Booking: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState<IAddress | null>(null);
   const [selectedTheater, setSelectedTheater] = useState<ITheater | null>(null);
   const [selectedShowtime, setSelectedShowtime] = useState<IShowtime | null>(
-    null
+    null,
   );
   const [selectedDate, setSelectedDate] = useState<string>(
-    formatBookingDate(new Date())
+    formatBookingDate(new Date()),
   );
 
   // Loading states
@@ -150,14 +150,14 @@ const Booking: React.FC = () => {
       try {
         const response = await showtimeApi.getListShowtimeByFilmAndDate(
           date,
-          filmId
+          filmId,
         );
         if (response.statusCode === 200) {
           const data = response.data?.data || response.data || [];
           // Filter showtimes for selected theater using passed theaterId
           const filteredShowtimes = Array.isArray(data)
             ? data.filter(
-                (st: IShowtime) => st.auditorium?.theater?.id === theaterId
+                (st: IShowtime) => st.auditorium?.theater?.id === theaterId,
               )
             : [];
           setShowtimes(filteredShowtimes);
@@ -168,7 +168,7 @@ const Booking: React.FC = () => {
         setLoadingShowtimes(false);
       }
     },
-    []
+    [],
   );
 
   // Fetch seats when showtime is selected
@@ -234,7 +234,7 @@ const Booking: React.FC = () => {
           return { ...seat, isSelected: !seat.isSelected };
         }
         return seat;
-      })
+      }),
     );
   };
 
@@ -278,13 +278,15 @@ const Booking: React.FC = () => {
       acc[seat.seatRow].push(seat);
       return acc;
     },
-    {} as Record<string, SeatWithSelection[]>
+    {} as Record<string, SeatWithSelection[]>,
   );
 
   const rows = Object.keys(seatsByRow).sort();
   // Shared layout convention with Smart Seat: one central aisle.
-  const aisleAfter = Math.floor(Math.max(0, ...seats.map(seat => seat.number)) / 2);
-  const columns = Math.max(0, ...seats.map(seat => seat.number));
+  const aisleAfter = Math.floor(
+    Math.max(0, ...seats.map((seat) => seat.number)) / 2,
+  );
+  const columns = Math.max(0, ...seats.map((seat) => seat.number));
 
   // Render seat button
   const renderSeat = (seat: SeatWithSelection) => {
@@ -436,7 +438,7 @@ const Booking: React.FC = () => {
                     value={selectedAddress?.id || ""}
                     onChange={(e) => {
                       const addr = addresses.find(
-                        (a) => a.id === parseInt(e.target.value)
+                        (a) => a.id === parseInt(e.target.value),
                       );
                       if (addr) handleAddressSelect(addr);
                     }}
@@ -605,20 +607,46 @@ const Booking: React.FC = () => {
                 {/* Seat Grid: keep empty positions and aisle aligned across rows. */}
                 <div className="w-full overflow-x-auto pb-4 mb-3">
                   <div className="w-max min-w-full mx-auto">
-                    {rows.map(row => (
-                      <div key={row} className="flex justify-center items-center gap-2 md:gap-3 mb-3">
-                        <span className="w-6 shrink-0 text-[#c9929b] text-xs font-bold">{row}</span>
-                        {Array.from({length: columns}, (_, index) => {
+                    {rows.map((row) => (
+                      <div
+                        key={row}
+                        className="flex justify-center items-center gap-2 md:gap-3 mb-3"
+                      >
+                        <span className="w-6 shrink-0 text-[#c9929b] text-xs font-bold">
+                          {row}
+                        </span>
+                        {Array.from({ length: columns }, (_, index) => {
                           const number = index + 1;
-                          const seat = seatsByRow[row].find(item => item.number === number);
-                          return <div key={number} className="flex items-center gap-2 md:gap-3 shrink-0">
-                            {seat ? renderSeat(seat) : <span className="size-8 md:size-9" aria-hidden="true" />}
-                            {number === aisleAfter && <span className="w-8 md:w-12 h-8 md:h-9 border-x border-dashed border-[#75404c]/50" aria-label="Lối đi giữa hai cụm ghế" />}
-                          </div>;
+                          const seat = seatsByRow[row].find(
+                            (item) => item.number === number,
+                          );
+                          return (
+                            <div
+                              key={number}
+                              className="flex items-center gap-2 md:gap-3 shrink-0"
+                            >
+                              {seat ? (
+                                renderSeat(seat)
+                              ) : (
+                                <span
+                                  className="size-8 md:size-9"
+                                  aria-hidden="true"
+                                />
+                              )}
+                              {number === aisleAfter && (
+                                <span
+                                  className="w-8 md:w-12 h-8 md:h-9 border-x border-dashed border-[#75404c]/50"
+                                  aria-label="Lối đi giữa hai cụm ghế"
+                                />
+                              )}
+                            </div>
+                          );
                         })}
                       </div>
                     ))}
-                    <p className="text-center text-xs text-[#c9929b] mt-4">Lối đi ở giữa hai cụm ghế</p>
+                    <p className="text-center text-xs text-[#c9929b] mt-4">
+                      Lối đi ở giữa hai cụm ghế
+                    </p>
                   </div>
                 </div>
 
@@ -710,7 +738,7 @@ const Booking: React.FC = () => {
                                 day: "2-digit",
                                 month: "2-digit",
                                 year: "numeric",
-                              }
+                              },
                             )
                           : "Chưa chọn ngày"}
                       </p>

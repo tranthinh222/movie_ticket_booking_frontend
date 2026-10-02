@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import {
   Table,
@@ -26,11 +27,11 @@ interface Address {
   street_number: string;
   street_name: string;
   city: string;
-  createdAt: string;
-  updatedAt: string | null;
-  createdBy: string;
-  updatedBy: string;
-  theaters: unknown[];
+  createdAt?: string;
+  updatedAt?: string | null;
+  createdBy?: string;
+  updatedBy?: string | null;
+  theaters?: unknown[];
 }
 
 const SIZE = 5;

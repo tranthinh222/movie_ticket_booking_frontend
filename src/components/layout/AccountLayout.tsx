@@ -46,7 +46,11 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
       if (user?.id) {
         try {
           const res = await bookingApi.getUserBooking(user.id, 1, 1);
-          const meta = (res as any).data?.meta || (res as any).meta;
+          const response = res as unknown as {
+            data?: { meta?: { totalItems?: number } };
+            meta?: { totalItems?: number };
+          };
+          const meta = response.data?.meta ?? response.meta;
           if (meta?.totalItems !== undefined) {
             setBookedCount(meta.totalItems);
           }
@@ -168,7 +172,11 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
           <div className="flex items-center gap-3 mb-2">
             <div className="size-12 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center text-primary font-bold overflow-hidden">
               {user.avatar ? (
-                <img src={user.avatar} className="w-full h-full object-cover" />
+                <img
+                  src={user.avatar}
+                  alt={`Ảnh đại diện của ${user.username}`}
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 user.username?.charAt(0).toUpperCase()
               )}

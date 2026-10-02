@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import {
   Table,
@@ -289,7 +290,7 @@ const UserManagement: React.FC = () => {
           setOpenCreate(false);
           createForm.resetFields();
         }}
-        title="Tạo User Mới"
+        title="Tạo người dùng mới"
         okText="Tạo"
         cancelText="Hủy"
         destroyOnClose
@@ -297,9 +298,9 @@ const UserManagement: React.FC = () => {
       >
         <Form layout="vertical" form={createForm}>
           <Form.Item
-            label="Username"
+            label="Tên đăng nhập"
             name="username"
-            rules={[{ required: true, message: "Username is required" }]}
+            rules={[{ required: true, message: "Vui lòng nhập tên đăng nhập" }]}
           >
             <Input placeholder="Nhập username" />
           </Form.Item>
@@ -313,11 +314,11 @@ const UserManagement: React.FC = () => {
           </Form.Item>
 
           <Form.Item
-            label="Password"
+            label="Mật khẩu"
             name="password"
-            rules={[{ required: true, message: "Password is required" }]}
+            rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
           >
-            <Input.Password placeholder="Nhập password" />
+            <Input.Password placeholder="Nhập mật khẩu" />
           </Form.Item>
 
           <Form.Item
@@ -329,9 +330,9 @@ const UserManagement: React.FC = () => {
           </Form.Item>
 
           <Form.Item
-            label="Role"
+            label="Vai trò"
             name="role"
-            rules={[{ required: true, message: "Role is required" }]}
+            rules={[{ required: true, message: "Vui lòng chọn vai trò" }]}
           >
             <Select placeholder="Chọn role">
               <Select.Option value="CUSTOMER">Khách hàng</Select.Option>
@@ -349,7 +350,7 @@ const UserManagement: React.FC = () => {
           setEditingUser(null);
           editForm.resetFields();
         }}
-        title="Cập Nhật User"
+        title="Cập nhật người dùng"
         okText="Cập nhật"
         cancelText="Hủy"
         destroyOnClose
@@ -372,9 +373,9 @@ const UserManagement: React.FC = () => {
           )}
 
           <Form.Item
-            label="Username"
+            label="Tên đăng nhập"
             name="username"
-            rules={[{ required: true, message: "Username is required" }]}
+            rules={[{ required: true, message: "Vui lòng nhập tên đăng nhập" }]}
           >
             <Input placeholder="Nhập username" />
           </Form.Item>
@@ -388,9 +389,9 @@ const UserManagement: React.FC = () => {
           </Form.Item>
 
           <Form.Item
-            label="Role"
+            label="Vai trò"
             name="role"
-            rules={[{ required: true, message: "Role is required" }]}
+            rules={[{ required: true, message: "Vui lòng chọn vai trò" }]}
           >
             <Select placeholder="Chọn role">
               <Select.Option value="CUSTOMER">Khách hàng</Select.Option>

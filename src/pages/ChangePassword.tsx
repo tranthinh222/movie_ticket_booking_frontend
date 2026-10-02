@@ -4,6 +4,7 @@ import { useAuth } from "../store/useAuth";
 import userApi from "../services/api-user";
 import authApi from "../services/api-auth";
 import AccountLayout from "../components/layout/AccountLayout";
+import { getApiErrorMessage } from "../utils/api-error";
 
 // Password strength levels
 type PasswordStrength = "weak" | "medium" | "strong" | "very-strong";
@@ -146,10 +147,12 @@ const ChangePassword: React.FC = () => {
 
       // Redirect immediately
       navigate("/login", { replace: true });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Change password error:", error);
-      const errorMessage =
-        error?.message || "Có lỗi xảy ra. Vui lòng thử lại sau.";
+      const errorMessage = getApiErrorMessage(
+        error,
+        "Có lỗi xảy ra. Vui lòng thử lại sau.",
+      );
       setMessage({
         type: "error",
         text: errorMessage,

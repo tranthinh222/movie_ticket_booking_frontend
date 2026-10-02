@@ -20,7 +20,7 @@ const theaterApi = {
 
   createTheater: async (
     name: string,
-    addressId: number
+    addressId: number,
   ): Promise<IBackendRes<any>> => {
     const response = await axios.post(`/api/v1/theaters`, {
       name,
@@ -29,14 +29,15 @@ const theaterApi = {
     return response;
   },
   getAuditoriumByTheaterId: async (id: number) => {
-    const response = await axios.get(
-      `/api/v1/auditoriums/theater/${id}`
-    );
+    const response = await axios.get(`/api/v1/auditoriums/theater/${id}`);
     return response;
   },
   removeTheater: async (id: number) => {
     const response = await axios.delete(`/api/v1/theaters/${id}`);
     return response;
+  },
+  updateTheater: async (id: number, name: string) => {
+    return axios.put(`/api/v1/theaters`, { id, name });
   },
 };
 

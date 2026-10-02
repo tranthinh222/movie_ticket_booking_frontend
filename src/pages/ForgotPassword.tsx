@@ -21,7 +21,9 @@ const ForgotPassword = () => {
       message.success("Mã xác thực đã được gửi đến email của bạn!");
       navigate("/verify-otp", { state: { email } });
     } catch (error: unknown) {
-      message.error(getApiErrorMessage(error, "Gửi mã thất bại. Vui lòng thử lại!"));
+      message.error(
+        getApiErrorMessage(error, "Gửi mã thất bại. Vui lòng thử lại!"),
+      );
     } finally {
       setLoading(false);
     }

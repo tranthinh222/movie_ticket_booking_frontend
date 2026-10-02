@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
 
 interface PaymentState {
   movie: IFilm;
@@ -13,6 +13,9 @@ const PaymentFailure: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as PaymentState | null;
+  const [searchParams] = useSearchParams();
+  const transactionCode = searchParams.get("vnp_TxnRef");
+  const responseCode = searchParams.get("vnp_ResponseCode");
 
   const handleRetry = () => {
     if (state) {
@@ -85,19 +88,25 @@ const PaymentFailure: React.FC = () => {
 
           {/* Footer Info */}
           <div className="mt-10 pt-8 border-t border-white/5 w-full flex flex-col items-center gap-4">
-            <div className="px-4 py-2 bg-black/40 rounded-lg border border-white/5">
-              <p className="text-[10px] font-mono text-[#c9929b] uppercase tracking-widest">
-                Mã lỗi: ERR-204 | TXN-
-                {Math.floor(100000 + Math.random() * 900000)}
-              </p>
-            </div>
+            {(transactionCode || responseCode) && (
+              <div className="px-4 py-2 bg-black/40 rounded-lg border border-white/5">
+                <p className="text-[10px] font-mono text-[#c9929b] uppercase tracking-widest">
+                  {responseCode && `Mã phản hồi: ${responseCode}`}
+                  {responseCode && transactionCode && " | "}
+                  {transactionCode && `Giao dịch: ${transactionCode}`}
+                </p>
+              </div>
+            )}
 
-            <button className="flex items-center gap-2 text-xs text-[#c9929b] hover:text-white transition-colors">
+            <Link
+              to="/support"
+              className="flex items-center gap-2 text-xs text-[#c9929b] hover:text-white transition-colors"
+            >
               <span className="material-symbols-outlined text-base">
                 headset_mic
               </span>
               Cần giúp đỡ? Liên hệ bộ phận CSKH
-            </button>
+            </Link>
           </div>
         </div>
       </div>

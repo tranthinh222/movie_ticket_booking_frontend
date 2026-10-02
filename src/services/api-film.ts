@@ -6,9 +6,8 @@ const filmApi = {
     page = 1,
     size?: number,
     name?: string,
-    genre?: string
+    genre?: string,
   ) => {
-
     const params: any = {
       page,
       sort: "releaseDate,desc",
@@ -41,7 +40,6 @@ const filmApi = {
   },
 
   uploadImg: async (file: any) => {
-
     const formData = new FormData();
     formData.append("file", file);
 

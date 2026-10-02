@@ -1,10 +1,14 @@
-import axios from "axios";
+import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
+
+interface RetriableRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
 
 const rawBackendUrl = import.meta.env.VITE_BACKEND_URL?.trim();
 
 if (!rawBackendUrl) {
   throw new Error(
-    "Missing VITE_BACKEND_URL. Configure it before building the frontend."
+    "Missing VITE_BACKEND_URL. Configure it before building the frontend.",
   );
 }
 
@@ -18,12 +22,16 @@ const instance = axios.create({
 
 const handleRefreshToken = async (): Promise<string | null> => {
   try {
-    const res = await instance.get("/api/v1/auth/refresh");
-    if (res && (res as any).data?.accessToken) {
-      return (res as any).data.accessToken;
+    const res = (await instance.get("/api/v1/auth/refresh")) as unknown as {
+      data?: { accessToken?: string };
+      accessToken?: string;
+    };
+    const accessToken = res.data?.accessToken ?? res.accessToken;
+    if (accessToken) {
+      return accessToken;
     }
     return null;
-  } catch (error) {
+  } catch {
     return null;
   }
 };
@@ -31,34 +39,51 @@ const handleRefreshToken = async (): Promise<string | null> => {
 instance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("access_token");
-    const pathname = new URL(config.url || "", config.baseURL || window.location.origin).pathname;
+    const pathname = new URL(
+      config.url || "",
+      config.baseURL || window.location.origin,
+    ).pathname;
     const isPublicFilmRequest =
       config.method?.toLowerCase() === "get" &&
       /^\/api\/v1\/(?:films|news|discounts)(?:\/|$)/.test(pathname);
-    const isPublicAssistantRequest = config.method?.toLowerCase() === "post" &&
-      /^\/api\/v1\/assistant\/(?:chat|recommendations|seat-recommendations)$/.test(pathname);
+    const isPublicAssistantRequest =
+      config.method?.toLowerCase() === "post" &&
+      /^\/api\/v1\/assistant\/(?:chat|recommendations|seat-recommendations)$/.test(
+        pathname,
+      );
     const isRefreshRequest = pathname === "/api/v1/auth/refresh";
-    const isAuthEntryRequest = /^\/api\/v1\/auth\/(?:login|register)$/.test(pathname);
-    if (token && !isPublicFilmRequest && !isPublicAssistantRequest && !isRefreshRequest && !isAuthEntryRequest) {
+    const isAuthEntryRequest = /^\/api\/v1\/auth\/(?:login|register)$/.test(
+      pathname,
+    );
+    if (
+      token &&
+      !isPublicFilmRequest &&
+      !isPublicAssistantRequest &&
+      !isRefreshRequest &&
+      !isAuthEntryRequest
+    ) {
       config.headers = config.headers || {};
       config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 instance.interceptors.response.use(
   (response) => {
     return response.data || response;
   },
-  async (error) => {
-    const originalRequest = error.config;
+  async (error: AxiosError) => {
+    const originalRequest = error.config as RetriableRequestConfig | undefined;
     if (
+      originalRequest &&
       error.response &&
       error.response.status === 401 &&
       !originalRequest._retry &&
-      !/\/api\/v1\/auth\/(?:refresh|login|register)(?:[?#]|$)/.test(originalRequest.url)
+      !/\/api\/v1\/auth\/(?:refresh|login|register)(?:[?#]|$)/.test(
+        originalRequest.url ?? "",
+      )
     ) {
       originalRequest._retry = true;
       const access_token = await handleRefreshToken();
@@ -69,8 +94,8 @@ instance.interceptors.response.use(
         return instance(originalRequest);
       }
     }
-    return Promise.reject(error.response?.data || error);
-  }
+    return Promise.reject(error.response?.data ?? error);
+  },
 );
 
 export default instance;

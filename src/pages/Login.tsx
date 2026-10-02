@@ -56,10 +56,14 @@ const Login: React.FC = () => {
         navigate("/");
       } else {
         // Handle error from backend
-        setError(getApiErrorMessage(response, "Đăng nhập thất bại. Vui lòng thử lại."));
+        setError(
+          getApiErrorMessage(response, "Đăng nhập thất bại. Vui lòng thử lại."),
+        );
       }
     } catch (err: unknown) {
-      setError(getApiErrorMessage(err, "Đăng nhập thất bại. Vui lòng thử lại."));
+      setError(
+        getApiErrorMessage(err, "Đăng nhập thất bại. Vui lòng thử lại."),
+      );
     } finally {
       setIsLoading(false);
     }

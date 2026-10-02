@@ -22,15 +22,12 @@ const bookingApi = {
   },
 
   getUserBooking: async (userId: number, page: number, size?: number) => {
-    const response = await axios.get(
-      `/api/v1/users/${userId}/bookings`,
-      {
-        params: {
-          page,
-          size,
-        },
-      }
-    );
+    const response = await axios.get(`/api/v1/users/${userId}/bookings`, {
+      params: {
+        page,
+        size,
+      },
+    });
     return response;
   },
   getTotalRevenue: async (month: number, year: number) => {
@@ -48,10 +45,7 @@ const bookingApi = {
     const data = {
       status,
     };
-    const response = await axios.put(
-      `/api/v1/bookings/${id}/status`,
-      data
-    );
+    const response = await axios.put(`/api/v1/bookings/${id}/status`, data);
     return response;
   },
 };

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import {
   Table,
@@ -173,7 +174,9 @@ const BookingManagement: React.FC = () => {
       key: "user",
       render: (_: unknown, record: Booking) => (
         <div>
-          <div style={{ fontWeight: 600 }}>{record.user?.name || "N/A"}</div>
+          <div style={{ fontWeight: 600 }}>
+            {record.user?.name || "Chưa cập nhật"}
+          </div>
           <Text type="secondary" style={{ fontSize: "12px" }}>
             {record.createdBy}
           </Text>
@@ -310,10 +313,10 @@ const BookingManagement: React.FC = () => {
             </Button>
           </Popconfirm>,
           <Button key="close" onClick={() => setSelected(null)}>
-            Close
+            Đóng
           </Button>,
         ]}
-        title={`Booking Details #${selected?.id}`}
+        title={`Chi tiết đặt vé #${selected?.id}`}
         width={700}
         destroyOnClose
       >
@@ -378,7 +381,7 @@ const BookingManagement: React.FC = () => {
               <div>
                 <Text type="secondary">User</Text>
                 <div style={{ fontWeight: 500 }}>
-                  {selected.user?.name || "N/A"}
+                  {selected.user?.name || "Chưa cập nhật"}
                 </div>
                 <Text style={{ fontSize: 12 }} type="secondary">
                   ID: {selected.user?.id}

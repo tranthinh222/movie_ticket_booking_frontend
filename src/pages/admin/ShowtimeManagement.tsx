@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import {
   Table,
@@ -457,16 +458,16 @@ const ShowtimeManagement: React.FC = () => {
               disabled={filmPage === 1}
               onClick={() => setFilmPage((p) => p - 1)}
             >
-              Prev
+              Trước
             </Button>
             <Text>
-              Page {filmPage} / {filmTotalPages}
+              Trang {filmPage} / {filmTotalPages}
             </Text>
             <Button
               disabled={filmPage === filmTotalPages}
               onClick={() => setFilmPage((p) => p + 1)}
             >
-              Next
+              Sau
             </Button>
           </Space>
         </div>

@@ -4,6 +4,13 @@ import userApi from "../services/api-user";
 import uploadApi from "../services/api-upload";
 import AccountLayout from "../components/layout/AccountLayout";
 
+interface ProfileUpdatePayload {
+  username: string;
+  phone: string;
+  gender: string;
+  avatar?: string;
+}
+
 const Profile: React.FC = () => {
   const { user, authenticated, setUser } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -92,7 +99,7 @@ const Profile: React.FC = () => {
       }
 
       // Prepare update payload
-      const updatePayload: any = {
+      const updatePayload: ProfileUpdatePayload = {
         username: formData.username,
         phone: formData.phone,
         gender: formData.gender,
@@ -208,7 +215,7 @@ const Profile: React.FC = () => {
               {/* Preview indicator */}
               {avatarPreview && (
                 <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-[10px] px-2 py-0.5 rounded-full font-bold">
-                  Preview
+                  Xem trước
                 </div>
               )}
             </div>
