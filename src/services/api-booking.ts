@@ -7,11 +7,11 @@ const bookingApi = {
     });
     return response;
   },
-  getAllBooking: async (page?: number, limit?: number) => {
+  getAllBooking: async (page?: number, size?: number) => {
     const response = await axios.get(`/api/v1/bookings`, {
       params: {
         page,
-        limit,
+        size,
       },
     });
     return response;

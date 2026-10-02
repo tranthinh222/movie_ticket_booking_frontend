@@ -35,8 +35,8 @@ const authApi = {
     const response = await axios.get(`/api/v1/auth/account`);
     return response;
   },
-  refreshToken: async (): Promise<IBackendRes<string>> => {
-    const response = await axios.post(`/api/v1/auth/refresh_token`);
+  refreshToken: async (): Promise<IBackendRes<ILoginRes>> => {
+    const response = await axios.get(`/api/v1/auth/refresh`);
     return response;
   },
 

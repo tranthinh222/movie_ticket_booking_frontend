@@ -215,9 +215,9 @@ const Header: React.FC = () => {
                   className="fixed inset-0 z-40"
                   onClick={() => setShowSearchResults(false)}
                 />
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#2d1519] rounded-lg shadow-xl border border-gray-200 dark:border-[#482329] overflow-hidden z-50 max-h-[400px] overflow-y-auto">
+                <div className="absolute top-full right-0 mt-2 w-80 lg:w-96 max-w-[calc(100vw-2rem)] whitespace-normal bg-white dark:bg-[#2d1519] rounded-lg shadow-xl border border-gray-200 dark:border-[#482329] overflow-hidden z-50 max-h-[400px] overflow-y-auto">
                   {searchResults.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500 dark:text-[#c9929b]">
+                    <div className="p-4 text-center text-sm leading-6 text-gray-500 dark:text-[#c9929b] break-words">
                       {isSearching ? (
                         "Đang tìm kiếm..."
                       ) : (

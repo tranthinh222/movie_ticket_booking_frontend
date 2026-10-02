@@ -19,9 +19,7 @@ const filmApi = {
 
     const filters: string[] = [];
 
-    if (name && name.trim() !== "") {
-      filters.push(`name~'${name}'`);
-    }
+    if (name && name.trim() !== "") params.search = name.trim();
 
     if (genre && genre !== "all") {
       filters.push(`genre='${genre}'`);

@@ -14,8 +14,8 @@ const PaymentFailure: React.FC = () => {
   const navigate = useNavigate();
   const state = location.state as PaymentState | null;
   const [searchParams] = useSearchParams();
-  const transactionCode = searchParams.get("vnp_TxnRef");
-  const responseCode = searchParams.get("vnp_ResponseCode");
+  const transactionCode = searchParams.get("transactionRef");
+  const responseCode = searchParams.get("responseCode");
 
   const handleRetry = () => {
     if (state) {

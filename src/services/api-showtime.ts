@@ -17,7 +17,7 @@ const showtimeApi = {
   },
 
   update: (id: number, data: any) => {
-    return axios.put(`/api/v1/showtimes/${id}`, data);
+    return axios.put(`/api/v1/showtimes`, { id, ...data });
   },
 
   delete: (id: number) => {
