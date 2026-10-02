@@ -604,51 +604,66 @@ const Booking: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Seat Grid: keep empty positions and aisle aligned across rows. */}
-                <div className="w-full overflow-x-auto pb-4 mb-3">
-                  <div className="w-max min-w-full mx-auto">
-                    {rows.map((row) => (
-                      <div
-                        key={row}
-                        className="flex justify-center items-center gap-2 md:gap-3 mb-3"
-                      >
-                        <span className="w-6 shrink-0 text-[#c9929b] text-xs font-bold">
-                          {row}
-                        </span>
-                        {Array.from({ length: columns }, (_, index) => {
-                          const number = index + 1;
-                          const seat = seatsByRow[row].find(
-                            (item) => item.number === number,
-                          );
-                          return (
-                            <div
-                              key={number}
-                              className="flex items-center gap-2 md:gap-3 shrink-0"
-                            >
-                              {seat ? (
-                                renderSeat(seat)
-                              ) : (
-                                <span
-                                  className="size-8 md:size-9"
-                                  aria-hidden="true"
-                                />
-                              )}
-                              {number === aisleAfter && (
-                                <span
-                                  className="w-8 md:w-12 h-8 md:h-9 border-x border-dashed border-[#75404c]/50"
-                                  aria-label="Lối đi giữa hai cụm ghế"
-                                />
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ))}
-                    <p className="text-center text-xs text-[#c9929b] mt-4">
-                      Lối đi ở giữa hai cụm ghế
+                {seats.length === 0 ? (
+                  <div className="flex flex-1 flex-col items-center justify-center px-4 pb-12 text-center">
+                    <span className="material-symbols-outlined mb-3 text-5xl text-[#c9929b]">
+                      event_busy
+                    </span>
+                    <p className="font-semibold text-white">
+                      Phòng chiếu chưa có sơ đồ ghế
+                    </p>
+                    <p className="mt-2 max-w-md text-sm text-[#c9929b]">
+                      Vui lòng chọn suất chiếu khác hoặc liên hệ quản trị viên
+                      để cập nhật ghế cho phòng này.
                     </p>
                   </div>
-                </div>
+                ) : (
+                  /* Seat Grid: keep empty positions and aisle aligned across rows. */
+                  <div className="w-full overflow-x-auto pb-4 mb-3">
+                    <div className="w-max min-w-full mx-auto">
+                      {rows.map((row) => (
+                        <div
+                          key={row}
+                          className="flex justify-center items-center gap-2 md:gap-3 mb-3"
+                        >
+                          <span className="w-6 shrink-0 text-[#c9929b] text-xs font-bold">
+                            {row}
+                          </span>
+                          {Array.from({ length: columns }, (_, index) => {
+                            const number = index + 1;
+                            const seat = seatsByRow[row].find(
+                              (item) => item.number === number,
+                            );
+                            return (
+                              <div
+                                key={number}
+                                className="flex items-center gap-2 md:gap-3 shrink-0"
+                              >
+                                {seat ? (
+                                  renderSeat(seat)
+                                ) : (
+                                  <span
+                                    className="size-8 md:size-9"
+                                    aria-hidden="true"
+                                  />
+                                )}
+                                {number === aisleAfter && (
+                                  <span
+                                    className="w-8 md:w-12 h-8 md:h-9 border-x border-dashed border-[#75404c]/50"
+                                    aria-label="Lối đi giữa hai cụm ghế"
+                                  />
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ))}
+                      <p className="text-center text-xs text-[#c9929b] mt-4">
+                        Lối đi ở giữa hai cụm ghế
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Legend */}
                 <div className="flex flex-wrap justify-center gap-6 md:gap-10 mt-auto pt-6 border-t border-[#482329] w-full">
