@@ -16,6 +16,23 @@ interface PaymentState {
   holdTime: number;
 }
 
+interface BankTransferState {
+  paymentId: number;
+  bookingId: number;
+  paymentCode: string;
+  qrUrl: string;
+  amount: number;
+}
+
+interface CreateBookingResponse {
+  data?: CreateBookingResponse;
+  price?: number;
+  paymentId?: number;
+  bookingId?: number;
+  paymentCode?: string;
+  qrUrl?: string;
+}
+
 const Payment: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -49,6 +66,10 @@ const Payment: React.FC = () => {
     }
   };
   const [isProcessing, setIsProcessing] = useState(false);
+  const [bankTransfer, setBankTransfer] = useState<BankTransferState | null>(
+    null,
+  );
+  const [qrTimeRemaining, setQrTimeRemaining] = useState(0);
 
   // Redirect if no state
   useEffect(() => {
@@ -59,7 +80,7 @@ const Payment: React.FC = () => {
 
   // Timer countdown
   useEffect(() => {
-    if (!state || timeRemaining <= 0) return;
+    if (!state || bankTransfer || timeRemaining <= 0) return;
 
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
@@ -73,7 +94,18 @@ const Payment: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [state, timeRemaining]);
+  }, [state, bankTransfer, timeRemaining]);
+
+  // VietQR is visible for five minutes after it is created.
+  useEffect(() => {
+    if (!bankTransfer || qrTimeRemaining <= 0) return;
+
+    const timer = window.setInterval(() => {
+      setQrTimeRemaining((previous) => Math.max(0, previous - 1));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [bankTransfer, qrTimeRemaining]);
 
   // Format time
   const formatTime = (seconds: number) => {
@@ -129,25 +161,38 @@ const Payment: React.FC = () => {
         selectedPaymentMethod,
         discountQuote?.code,
       );
+      const wrapped = response as unknown as CreateBookingResponse;
+      const data = wrapped.data ?? wrapped;
 
       if (selectedPaymentMethod === "CASH") {
         message.success("Đặt vé thành công! Vui lòng thanh toán tại quầy.");
         navigate("/payment-success", {
           state: {
             ...state,
-            totalPrice: response.data?.price ?? state.totalPrice,
+            totalPrice: data.price ?? state.totalPrice,
             paymentMethod: selectedPaymentMethod,
           },
         });
-      } else {
-        // For VNPAY and MOMO, redirect to payment URL
-        const paymentUrl =
-          response.data?.paymentUrl || response.data?.data?.paymentUrl;
-        if (paymentUrl) {
-          window.location.href = paymentUrl;
+      } else if (selectedPaymentMethod === "BANK_TRANSFER") {
+        if (
+          data.paymentId &&
+          data.bookingId &&
+          data.paymentCode &&
+          data.qrUrl
+        ) {
+          setBankTransfer({
+            paymentId: data.paymentId,
+            bookingId: data.bookingId,
+            paymentCode: data.paymentCode,
+            qrUrl: data.qrUrl,
+            amount: data.price ?? payableTotal,
+          });
+          setQrTimeRemaining(300);
         } else {
-          message.error("Không tìm thấy link thanh toán. Vui lòng thử lại.");
+          message.error("Không tạo được mã VietQR. Vui lòng thử lại.");
         }
+      } else {
+        message.error("Phương thức thanh toán không được hỗ trợ.");
       }
     } catch (error: unknown) {
       console.error("Payment error:", error);
@@ -168,6 +213,78 @@ const Payment: React.FC = () => {
 
   const { movie, cinema, showtime, seats, totalPrice } = state;
   const payableTotal = discountQuote?.total ?? totalPrice;
+
+  if (bankTransfer) {
+    return (
+      <div className="min-h-screen bg-[#221013] px-4 py-10 text-white">
+        <div className="mx-auto max-w-lg rounded-2xl border border-[#67323b] bg-[#33191e] p-6 text-center shadow-2xl">
+          <div className="mb-5 flex items-center justify-center gap-3">
+            <span className="material-symbols-outlined text-3xl text-primary">
+              qr_code_2
+            </span>
+            <h1 className="text-2xl font-black">Quét mã để thanh toán</h1>
+          </div>
+          {qrTimeRemaining > 0 ? (
+            <>
+              <div className="mb-4 inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-primary">
+                <span className="material-symbols-outlined text-lg">timer</span>
+                <span className="font-bold">
+                  Mã QR hết hạn sau {formatTime(qrTimeRemaining)}
+                </span>
+              </div>
+              <div className="mx-auto mb-5 w-full max-w-sm rounded-2xl bg-white p-3">
+                <img
+                  src={bankTransfer.qrUrl}
+                  alt="Mã VietQR thanh toán vé xem phim"
+                  className="h-auto w-full"
+                />
+              </div>
+            </>
+          ) : (
+            <div className="mx-auto mb-5 max-w-sm rounded-2xl border border-red-500/40 bg-red-500/10 p-8">
+              <span className="material-symbols-outlined mb-3 text-5xl text-red-400">
+                qr_code_off
+              </span>
+              <p className="font-bold text-red-300">Mã QR đã hết thời gian hiển thị</p>
+              <p className="mt-2 text-sm text-[#c9929b]">
+                Vui lòng quay về và thực hiện lại nếu cần tạo mã mới.
+              </p>
+            </div>
+          )}
+          <p className="text-[#c9929b]">Số tiền cần chuyển</p>
+          <p className="mb-4 text-3xl font-black text-primary">
+            {bankTransfer.amount.toLocaleString("vi-VN")}đ
+          </p>
+          <p className="text-[#c9929b]">Nội dung chuyển khoản</p>
+          <button
+            type="button"
+            onClick={() => {
+              void navigator.clipboard.writeText(bankTransfer.paymentCode);
+              message.success("Đã sao chép nội dung chuyển khoản.");
+            }}
+            className="mt-2 inline-flex items-center gap-2 rounded-lg border border-primary px-5 py-3 font-bold text-white hover:bg-primary/10"
+          >
+            {bankTransfer.paymentCode}
+            <span className="material-symbols-outlined text-lg">content_copy</span>
+          </button>
+          <div className="mt-6 rounded-xl bg-white/5 p-4 text-sm leading-6 text-[#e3b8bf]">
+            Đây là mã chuyển khoản minh họa. Hệ thống chưa tự động xác nhận giao
+            dịch; trạng thái thanh toán sẽ chờ quản trị viên đối soát.
+          </div>
+          <p className="mt-4 text-xs leading-5 text-[#c9929b]">
+            Nếu thực hiện chuyển khoản thật, vui lòng giữ nguyên số tiền và nội
+            dung để quản trị viên kiểm tra chính xác.
+          </p>
+          <Link
+            to="/"
+            className="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-primary px-5 py-3 font-bold text-white hover:bg-primary/90"
+          >
+            Quay về trang chủ
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#221013] text-white">
@@ -284,33 +401,25 @@ const Payment: React.FC = () => {
                   </div>
                 </label>
 
-                {/* VNPay Option */}
-                <label className="group relative flex items-center gap-4 rounded-xl border border-[#67323b] bg-[#33191e] p-4 cursor-pointer hover:border-primary/50 transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                <label className="group relative flex cursor-pointer items-center gap-4 rounded-xl border border-[#67323b] bg-[#33191e] p-4 transition-all hover:border-primary/50 has-[:checked]:border-primary has-[:checked]:bg-primary/10">
                   <input
-                    checked={selectedPaymentMethod === "VNPAY"}
-                    onChange={() => setSelectedPaymentMethod("VNPAY")}
-                    className="h-5 w-5 border-slate-600 text-primary focus:ring-primary bg-transparent"
+                    checked={selectedPaymentMethod === "BANK_TRANSFER"}
+                    onChange={() => setSelectedPaymentMethod("BANK_TRANSFER")}
+                    className="h-5 w-5 border-slate-600 bg-transparent text-primary focus:ring-primary"
                     name="payment_method"
                     type="radio"
                   />
-                  <div className="flex items-center justify-center size-12 rounded-lg bg-white p-1 border border-slate-100">
-                    <img
-                      alt="VNPay Logo"
-                      className="w-full h-auto object-contain"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJF52FG9-X2BPBTTT8w20Jhh2XFPI1JwZUA7lpbKoVjd7Q425nxO98d18vWVU1sisMudkWBUV4ii-Yt4ZuSept2LCyxNSYc5P7k7lAFfU3rD0l_sSozzDa93Jr90Lws6-HZl0f9GmxZUwWe-nC4yEx_T38IGk3X1qlaXHP4ZNedV69aORg21BikgqPYxPYEyClC0K9KYMbFUh0SlJ3pkqI-a0GVloVlRDj7blbI-R_pCHTdhkYgdE77TLGqvQhXQlSwvSfyug1ZgA"
-                    />
+                  <div className="flex size-12 items-center justify-center rounded-lg border border-slate-100 bg-white p-1">
+                    <span className="material-symbols-outlined text-3xl text-blue-700">
+                      qr_code_2
+                    </span>
                   </div>
                   <div className="flex grow flex-col">
-                    <div className="flex justify-between items-center w-full">
-                      <p className="text-white font-bold leading-normal">
-                        VNPay QR / Ngân hàng
-                      </p>
-                      <span className="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded">
-                        Miễn phí
-                      </span>
-                    </div>
-                    <p className="text-[#c9929b] text-sm font-normal leading-normal">
-                      Quét mã qua ứng dụng ngân hàng hoặc ví VNPay
+                    <p className="font-bold leading-normal text-white">
+                      Chuyển khoản ngân hàng (VietQR)
+                    </p>
+                    <p className="text-sm font-normal leading-normal text-[#c9929b]">
+                      Quét mã QR để điền sẵn số tiền và nội dung chuyển khoản
                     </p>
                   </div>
                 </label>
