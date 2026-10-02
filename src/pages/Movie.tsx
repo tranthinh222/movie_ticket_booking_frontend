@@ -20,7 +20,9 @@ const Movie: React.FC = () => {
       setLoading(true);
       setLoadError(null);
       try {
-        const response = await filmApi.getAllFilms(1, 100, search, undefined);
+        // Fetch the regular film list and filter locally. This keeps search
+        // accent-insensitive and avoids depending on the deployed BE search query.
+        const response = await filmApi.getAllFilms(1, 100, undefined, undefined);
         const data = response.data?.data || [];
         const matchingMovies = data.filter((movie: IFilm) =>
           matchesMovieName(movie, search),

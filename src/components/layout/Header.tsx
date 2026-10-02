@@ -18,6 +18,7 @@ const Header: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const filmCatalogRef = useRef<IFilm[] | null>(null);
 
   // Debounce search query with 300ms delay
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
@@ -49,14 +50,16 @@ const Header: React.FC = () => {
 
       setIsSearching(true);
       try {
-        const response = await filmApi.getAllFilms(
-          1,
-          100,
-          debouncedSearchQuery,
-        );
-        if (!ignoreResponse && response.statusCode === 200) {
-          const data = response.data?.data || response.data || [];
+        // Use the same stable list endpoint as the movie page and filter locally.
+        const response = filmCatalogRef.current
+          ? null
+          : await filmApi.getAllFilms(1, 100);
+        if (!ignoreResponse) {
+          const data = response
+            ? response.data?.data || response.data || []
+            : filmCatalogRef.current;
           const films = Array.isArray(data) ? data : [];
+          filmCatalogRef.current = films;
           setSearchResults(
             films
               .filter((film: IFilm) =>
