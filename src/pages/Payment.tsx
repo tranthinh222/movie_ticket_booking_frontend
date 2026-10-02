@@ -17,8 +17,6 @@ interface PaymentState {
 }
 
 interface BankTransferState {
-  paymentId: number;
-  bookingId: number;
   paymentCode: string;
   qrUrl: string;
   amount: number;
@@ -155,6 +153,28 @@ const Payment: React.FC = () => {
       return;
     }
 
+    if (selectedPaymentMethod === "BANK_TRANSFER") {
+      const bankId =
+        import.meta.env.VITE_VIETQR_BANK_ID?.trim() || "970418";
+      const accountNo =
+        import.meta.env.VITE_VIETQR_ACCOUNT_NO?.trim() || "8824121093";
+      const accountName =
+        import.meta.env.VITE_VIETQR_ACCOUNT_NAME?.trim() || "TRAN QUOC THINH";
+      const template =
+        import.meta.env.VITE_VIETQR_TEMPLATE?.trim() || "compact2";
+      const amount = Math.round(payableTotal);
+      const paymentCode = `MOVIE${Date.now()}`;
+      const qrUrl =
+        `https://img.vietqr.io/image/${bankId}-${accountNo}-${template}.png` +
+        `?amount=${amount}` +
+        `&addInfo=${encodeURIComponent(paymentCode)}` +
+        `&accountName=${encodeURIComponent(accountName)}`;
+
+      setBankTransfer({ paymentCode, qrUrl, amount });
+      setQrTimeRemaining(300);
+      return;
+    }
+
     setIsProcessing(true);
     try {
       const response = await bookingApi.createBooking(
@@ -173,24 +193,6 @@ const Payment: React.FC = () => {
             paymentMethod: selectedPaymentMethod,
           },
         });
-      } else if (selectedPaymentMethod === "BANK_TRANSFER") {
-        if (
-          data.paymentId &&
-          data.bookingId &&
-          data.paymentCode &&
-          data.qrUrl
-        ) {
-          setBankTransfer({
-            paymentId: data.paymentId,
-            bookingId: data.bookingId,
-            paymentCode: data.paymentCode,
-            qrUrl: data.qrUrl,
-            amount: data.price ?? payableTotal,
-          });
-          setQrTimeRemaining(300);
-        } else {
-          message.error("Không tạo được mã VietQR. Vui lòng thử lại.");
-        }
       } else {
         message.error("Phương thức thanh toán không được hỗ trợ.");
       }
