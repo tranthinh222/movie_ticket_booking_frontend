@@ -225,9 +225,11 @@ const Profile: React.FC = () => {
                 <h2 className="text-2xl font-bold text-white">
                   {user.username}
                 </h2>
-                <span className="bg-primary/20 text-primary border border-primary/30 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider self-center md:self-auto">
-                  {user.role === "ADMIN" ? "Quản trị viên" : "Khách hàng"}
-                </span>
+                {user.role === "ADMIN" && (
+                  <span className="bg-primary/20 text-primary border border-primary/30 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider self-center md:self-auto">
+                    Quản trị viên
+                  </span>
+                )}
               </div>
               <p className="text-[#c9929b] mb-1">{user.email}</p>
               {user.phone && (
