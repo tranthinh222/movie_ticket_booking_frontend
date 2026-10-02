@@ -13,9 +13,15 @@ interface Film {
   genre: string;
   language: string;
   releaseDate: string;
-  status: string | null;
+  status: "NOW_SHOWING" | "COMING_SOON" | "STOPPED" | null;
   thumbnail: string | null;
 }
+
+const filmStatusLabels: Record<NonNullable<Film["status"]>, string> = {
+  NOW_SHOWING: "Đang chiếu",
+  COMING_SOON: "Sắp chiếu",
+  STOPPED: "Đã ngừng chiếu",
+};
 
 const MovieDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -282,7 +288,7 @@ const MovieDetail: React.FC = () => {
                         Trạng thái
                       </span>
                       <span className="text-white font-medium">
-                        {film.status}
+                        {filmStatusLabels[film.status]}
                       </span>
                     </>
                   )}
