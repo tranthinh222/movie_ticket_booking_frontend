@@ -269,14 +269,6 @@ const Payment: React.FC = () => {
             {bankTransfer.paymentCode}
             <span className="material-symbols-outlined text-lg">content_copy</span>
           </button>
-          <div className="mt-6 rounded-xl bg-white/5 p-4 text-sm leading-6 text-[#e3b8bf]">
-            Đây là mã chuyển khoản minh họa. Hệ thống chưa tự động xác nhận giao
-            dịch; trạng thái thanh toán sẽ chờ quản trị viên đối soát.
-          </div>
-          <p className="mt-4 text-xs leading-5 text-[#c9929b]">
-            Nếu thực hiện chuyển khoản thật, vui lòng giữ nguyên số tiền và nội
-            dung để quản trị viên kiểm tra chính xác.
-          </p>
           <Link
             to="/"
             className="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-primary px-5 py-3 font-bold text-white hover:bg-primary/90"
