@@ -4,6 +4,7 @@ import { useAuth } from "../../store/useAuth";
 import authApi from "../../services/api-auth";
 import filmApi from "../../services/api-film";
 import { useDebounce } from "../../hooks/useDebounce";
+import { matchesMovieName } from "../../utils/movieSearch";
 
 const Header: React.FC = () => {
   const { user, authenticated, clearUser } = useAuth();
@@ -37,6 +38,8 @@ const Header: React.FC = () => {
 
   // Perform search when debounced query changes
   useEffect(() => {
+    let ignoreResponse = false;
+
     const performSearch = async () => {
       if (!debouncedSearchQuery.trim()) {
         setSearchResults([]);
@@ -46,21 +49,35 @@ const Header: React.FC = () => {
 
       setIsSearching(true);
       try {
-        const response = await filmApi.getAllFilms(1, 4, debouncedSearchQuery);
-        if (response.statusCode === 200) {
+        const response = await filmApi.getAllFilms(
+          1,
+          100,
+          debouncedSearchQuery,
+        );
+        if (!ignoreResponse && response.statusCode === 200) {
           const data = response.data?.data || response.data || [];
-          setSearchResults(Array.isArray(data) ? data : []);
+          const films = Array.isArray(data) ? data : [];
+          setSearchResults(
+            films
+              .filter((film: IFilm) =>
+                matchesMovieName(film, debouncedSearchQuery),
+              )
+              .slice(0, 4),
+          );
           setShowSearchResults(true);
         }
       } catch (error) {
         console.error("Search error:", error);
-        setSearchResults([]);
+        if (!ignoreResponse) setSearchResults([]);
       } finally {
-        setIsSearching(false);
+        if (!ignoreResponse) setIsSearching(false);
       }
     };
 
     performSearch();
+    return () => {
+      ignoreResponse = true;
+    };
   }, [debouncedSearchQuery]);
 
   // Handle search input change
