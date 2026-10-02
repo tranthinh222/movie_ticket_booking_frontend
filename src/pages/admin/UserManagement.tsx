@@ -80,7 +80,7 @@ const UserManagement: React.FC = () => {
         values.email,
         values.password,
         values.phone,
-        values.role
+        values.role,
       );
       if (res.statusCode === 201) {
         message.success("Tạo user thành công!");
@@ -185,9 +185,9 @@ const UserManagement: React.FC = () => {
       key: "role",
       render: (role: string) =>
         role === "ADMIN" ? (
-          <Tag color="red">ADMIN</Tag>
+          <Tag color="red">Quản trị viên</Tag>
         ) : (
-          <Tag color="blue">USER</Tag>
+          <Tag color="blue">Khách hàng</Tag>
         ),
     },
     {
@@ -334,8 +334,8 @@ const UserManagement: React.FC = () => {
             rules={[{ required: true, message: "Role is required" }]}
           >
             <Select placeholder="Chọn role">
-              <Select.Option value="CUSTOMER">CUSTOMER</Select.Option>
-              <Select.Option value="ADMIN">ADMIN</Select.Option>
+              <Select.Option value="CUSTOMER">Khách hàng</Select.Option>
+              <Select.Option value="ADMIN">Quản trị viên</Select.Option>
             </Select>
           </Form.Item>
         </Form>
@@ -393,8 +393,8 @@ const UserManagement: React.FC = () => {
             rules={[{ required: true, message: "Role is required" }]}
           >
             <Select placeholder="Chọn role">
-              <Select.Option value="USER">USER</Select.Option>
-              <Select.Option value="ADMIN">ADMIN</Select.Option>
+              <Select.Option value="CUSTOMER">Khách hàng</Select.Option>
+              <Select.Option value="ADMIN">Quản trị viên</Select.Option>
             </Select>
           </Form.Item>
         </Form>

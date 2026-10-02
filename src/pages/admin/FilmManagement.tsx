@@ -198,7 +198,10 @@ const FilmManagement = () => {
           COMING_SOON: { text: "Sắp chiếu", color: "blue" },
           STOPPED: { text: "Đã kết thúc", color: "gray" },
         };
-        const current = statusMap[status] || { text: status, color: "default" };
+        const current = statusMap[status] || {
+          text: status || "Chưa cập nhật",
+          color: "default",
+        };
         return <span style={{ color: current.color }}>{current.text}</span>;
       },
     },

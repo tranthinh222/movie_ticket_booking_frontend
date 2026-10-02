@@ -83,10 +83,10 @@ const SIZE = 10;
 
 const statusTag = (status: string) => {
   if (status === "CONFIRMED" || status === "COMPLETED")
-    return <Tag color="green">{status}</Tag>;
+    return <Tag color="green">Đã xác nhận</Tag>;
   if (status === "FAILED" || status === "CANCELLED")
-    return <Tag color="red">{status}</Tag>;
-  return <Tag color="gold">{status || "PENDING"}</Tag>;
+    return <Tag color="red">Đã hủy</Tag>;
+  return <Tag color="gold">Chờ xác nhận</Tag>;
 };
 
 const BookingManagement: React.FC = () => {
@@ -191,8 +191,14 @@ const BookingManagement: React.FC = () => {
           style={{ width: 130 }}
           disabled={record.status !== "PENDING"}
           options={[
-            { value: "PENDING", label: <Tag color="gold">PENDING</Tag> },
-            { value: "CONFIRMED", label: <Tag color="green">CONFIRMED</Tag> },
+            {
+              value: "PENDING",
+              label: <Tag color="gold">Chờ xác nhận</Tag>,
+            },
+            {
+              value: "CONFIRMED",
+              label: <Tag color="green">Đã xác nhận</Tag>,
+            },
           ]}
         />
       ),

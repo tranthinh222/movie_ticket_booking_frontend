@@ -4,8 +4,7 @@ import { Modal } from "antd";
 import bookingApi from "../services/api-booking";
 import AccountLayout from "../components/layout/AccountLayout";
 
-// Define ticket status types
-type TicketStatus = "upcoming" | "completed" | "cancelled";
+type TicketStatus = "PENDING" | "CONFIRMED" | "CANCELLED" | string;
 
 // Define ticket interface
 interface ITicket {
@@ -17,7 +16,7 @@ interface ITicket {
   date: string;
   time: string;
   seats: string[];
-  bookingCode: string;
+  bookingCode: number | null;
   totalPrice: number;
   discountCode?: string;
   discountAmount?: number;
@@ -52,45 +51,25 @@ const BookingHistory: React.FC = () => {
         }
 
         const mapped: ITicket[] = data.map((b: any) => {
-          let status: TicketStatus = "completed";
-
-          if (b.status === "CANCELLED") {
-            status = "cancelled";
-          } else {
-            // Determine status based on showtime date and time
-            const showDate = b.showtime?.date; // Expecting YYYY-MM-DD
-            const startTime = b.showtime?.startTime; // Expecting HH:mm:ss or HH:mm
-
-            if (showDate && startTime) {
-              const showtimeDateTime = new Date(`${showDate}T${startTime}`);
-              const now = new Date();
-
-              if (showtimeDateTime > now) {
-                status = "upcoming";
-              } else {
-                status = "completed";
-              }
-            } else if (b.status === "PENDING") {
-              status = "upcoming";
-            }
-          }
-
           return {
             id: String(b.id),
-            movieName: b.film?.name || b.showtime?.film?.name || "N/A",
-            posterUrl: b.film?.thumbnail || b.showtime?.film?.thumbnail || "",
-            theater: b.theater?.name || b.showtime?.theater?.name || "N/A",
-            auditorium: b.showtime?.auditoriumName || "Rạp",
-            date: b.showtime?.date || b.createdAt?.split(" ")[0] || "",
-            time: b.showtime?.startTime?.slice(0, 5) || "",
+            movieName: b.film?.name ?? "",
+            posterUrl: b.film?.thumbnail ?? "",
+            theater: b.theater?.name ?? "",
+            auditorium: b.showtime?.auditoriumNumber
+              ? `Phòng ${b.showtime.auditoriumNumber}`
+              : "Chưa cập nhật phòng chiếu",
+            date: b.showtime?.date ?? "",
+            time: b.showtime?.startTime?.slice(0, 5) ?? "",
             seats:
-              b.seats?.map((s: any) => `${s.seatRow || ""}${s.number}`) || [],
-            bookingCode: b.paymentId || `#BK${b.id}`,
-            totalPrice: b.total_price || 0,
+              b.seats?.map((s: any) => `${s.seatRow ?? ""}${s.number ?? ""}`) ??
+              [],
+            bookingCode: b.paymentId ?? null,
+            totalPrice: b.total_price ?? 0,
             discountCode: b.discountCode,
             discountAmount: b.discountAmount,
-            status: status,
-            qrCode: b.qrCode || b.qr_code || null,
+            status: b.status ?? "",
+            qrCode: b.qrCode ?? null,
           };
         });
 
@@ -113,26 +92,33 @@ const BookingHistory: React.FC = () => {
   // Get status badge
   const getStatusBadge = (status: TicketStatus) => {
     switch (status) {
-      case "upcoming":
+      case "PENDING":
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-            Sắp chiếu
+            Chờ xác nhận
           </span>
         );
-      case "completed":
+      case "CONFIRMED":
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-900/30 text-green-400 text-xs font-bold uppercase tracking-wider">
             <span className="material-symbols-outlined text-sm">
               check_circle
             </span>
+            Đã xác nhận
           </span>
         );
-      case "cancelled":
+      case "CANCELLED":
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-800 text-slate-400 text-xs font-bold uppercase tracking-wider">
             <span className="material-symbols-outlined text-sm">cancel</span>
             Đã hủy
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-bold uppercase tracking-wider">
+            {status || "Chưa cập nhật"}
           </span>
         );
     }
@@ -163,9 +149,9 @@ const BookingHistory: React.FC = () => {
               <div
                 key={ticket.id}
                 className={`group bg-[#2a1519] border border-[#482329] rounded-xl p-4 flex flex-col md:flex-row gap-5 transition-all shadow-sm hover:shadow-md ${
-                  ticket.status === "upcoming"
+                  ticket.status === "PENDING"
                     ? "hover:border-primary/50"
-                    : ticket.status === "cancelled"
+                    : ticket.status === "CANCELLED"
                       ? "opacity-75 hover:opacity-100 bg-[#1a0e10]"
                       : "opacity-90 hover:opacity-100 hover:border-gray-600"
                 }`}
@@ -173,15 +159,15 @@ const BookingHistory: React.FC = () => {
                 {/* Poster */}
                 <div
                   className={`shrink-0 w-full md:w-[100px] aspect-[2/3] rounded-lg bg-cover bg-center shadow-inner relative overflow-hidden ${
-                    ticket.status === "cancelled"
+                    ticket.status === "CANCELLED"
                       ? "grayscale"
-                      : ticket.status === "completed"
+                      : ticket.status === "CONFIRMED"
                         ? "grayscale group-hover:grayscale-0 transition-all duration-300"
                         : ""
                   }`}
                   style={{ backgroundImage: `url("${ticket.posterUrl}")` }}
                 >
-                  {ticket.status === "upcoming" && (
+                  {ticket.status === "PENDING" && (
                     <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
                   )}
                 </div>
@@ -192,9 +178,9 @@ const BookingHistory: React.FC = () => {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
                       <h3
                         className={`text-xl font-bold transition-colors ${
-                          ticket.status === "cancelled"
+                          ticket.status === "CANCELLED"
                             ? "text-slate-400 line-through decoration-2"
-                            : ticket.status === "upcoming"
+                            : ticket.status === "PENDING"
                               ? "text-white group-hover:text-primary"
                               : "text-white"
                         }`}
@@ -215,7 +201,7 @@ const BookingHistory: React.FC = () => {
                     </div>
                     <div
                       className={`grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 text-sm mt-3 ${
-                        ticket.status === "cancelled"
+                        ticket.status === "CANCELLED"
                           ? "text-slate-500"
                           : "text-[#c9929b]"
                       }`}
@@ -226,12 +212,12 @@ const BookingHistory: React.FC = () => {
                         </span>
                         <span>
                           {ticket.theater} -{" "}
-                          {ticket.status !== "cancelled" && (
+                          {ticket.status !== "CANCELLED" && (
                             <span className="text-white font-medium">
                               {ticket.auditorium}
                             </span>
                           )}
-                          {ticket.status === "cancelled" && ticket.auditorium}
+                          {ticket.status === "CANCELLED" && ticket.auditorium}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -240,12 +226,12 @@ const BookingHistory: React.FC = () => {
                         </span>
                         <span>
                           {ticket.time} -{" "}
-                          {ticket.status !== "cancelled" && (
+                          {ticket.status !== "CANCELLED" && (
                             <span className="text-white font-medium">
                               {ticket.date}
                             </span>
                           )}
-                          {ticket.status === "cancelled" && ticket.date}
+                          {ticket.status === "CANCELLED" && ticket.date}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -254,12 +240,12 @@ const BookingHistory: React.FC = () => {
                         </span>
                         <span>
                           Ghế:{" "}
-                          {ticket.status !== "cancelled" && (
+                          {ticket.status !== "CANCELLED" && (
                             <span className="text-white font-bold">
                               {ticket.seats.join(", ")}
                             </span>
                           )}
-                          {ticket.status === "cancelled" &&
+                          {ticket.status === "CANCELLED" &&
                             ticket.seats.join(", ")}
                         </span>
                       </div>
@@ -269,12 +255,17 @@ const BookingHistory: React.FC = () => {
                         </span>
                         <span>
                           Mã vé:{" "}
-                          {ticket.status !== "cancelled" && (
+                          {ticket.status !== "CANCELLED" && (
                             <span className="text-white font-mono">
-                              {ticket.bookingCode}
+                              {ticket.bookingCode
+                                ? `#${ticket.bookingCode}`
+                                : "Chưa có"}
                             </span>
                           )}
-                          {ticket.status === "cancelled" && ticket.bookingCode}
+                          {ticket.status === "CANCELLED" &&
+                            (ticket.bookingCode
+                              ? `#${ticket.bookingCode}`
+                              : "Chưa có")}
                         </span>
                       </div>
                     </div>
@@ -283,20 +274,20 @@ const BookingHistory: React.FC = () => {
                     <div className="flex flex-col">
                       <span
                         className={`text-xs ${
-                          ticket.status === "cancelled"
+                          ticket.status === "CANCELLED"
                             ? "text-slate-500"
                             : "text-[#c9929b]"
                         }`}
                       >
-                        {ticket.status === "cancelled"
+                        {ticket.status === "CANCELLED"
                           ? "Hoàn tiền"
                           : "Tổng tiền"}
                       </span>
                       <span
                         className={`text-lg font-bold ${
-                          ticket.status === "upcoming"
+                          ticket.status === "PENDING"
                             ? "text-primary"
-                            : ticket.status === "cancelled"
+                            : ticket.status === "CANCELLED"
                               ? "text-slate-500 line-through"
                               : "text-slate-300"
                         }`}
@@ -306,11 +297,12 @@ const BookingHistory: React.FC = () => {
                     </div>
                     {ticket.discountCode && (
                       <p className="text-sm text-[#c9929b]">
-                        Mã {ticket.discountCode}: giảm {(ticket.discountAmount || 0).toLocaleString("vi-VN")}đ
+                        Mã {ticket.discountCode}: giảm{" "}
+                        {(ticket.discountAmount || 0).toLocaleString("vi-VN")}đ
                       </p>
                     )}
                     <div className="flex gap-3">
-                      {ticket.qrCode && ticket.status !== "cancelled" && (
+                      {ticket.qrCode && ticket.status !== "CANCELLED" && (
                         <button
                           onClick={() => {
                             setSelectedQr(ticket.qrCode || null);
@@ -324,7 +316,7 @@ const BookingHistory: React.FC = () => {
                           Mã QR
                         </button>
                       )}
-                      {ticket.status === "cancelled" && (
+                      {ticket.status === "CANCELLED" && (
                         <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white text-sm font-medium transition-colors">
                           Xem chi tiết
                         </button>
@@ -363,7 +355,7 @@ const BookingHistory: React.FC = () => {
                   >
                     {page}
                   </button>
-                )
+                ),
               )}
               <button
                 disabled={currentPage === totalPages}

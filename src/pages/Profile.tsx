@@ -42,7 +42,7 @@ const Profile: React.FC = () => {
   }, [user]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -219,7 +219,7 @@ const Profile: React.FC = () => {
                   {user.username}
                 </h2>
                 <span className="bg-primary/20 text-primary border border-primary/30 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider self-center md:self-auto">
-                  {user.role || "USER"}
+                  {user.role === "ADMIN" ? "Quản trị viên" : "Khách hàng"}
                 </span>
               </div>
               <p className="text-[#c9929b] mb-1">{user.email}</p>
