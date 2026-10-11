@@ -29,7 +29,6 @@ const showtimeApi = {
   },
 
   getListShowtimeByFilmAndDate: async (date: string, filmId: number) => {
-    console.log(date);
     const filter = `date='${date}' and film.id=${filmId}`;
     const response = await axios.get(`/api/v1/showtimes`, {
       params: {
