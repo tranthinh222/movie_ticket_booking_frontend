@@ -1,27 +1,38 @@
-name: FE CI (Vite + React)
+# CI: install -> lint -> test -> build on every push and pull request.
+# Deployment stays with Vercel's Git integration.
+
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
+    name: Lint, Test & Build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # vite.config.ts refuses to load without it; the real value is set in Vercel
+      VITE_BACKEND_URL: http://localhost:8081
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: 'npm'
+          node-version: '22'
+          cache: npm
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
-
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
